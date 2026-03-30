@@ -4,684 +4,786 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NeyoDigitals — Nigeria's #1 Digital Products Platform</title>
-<meta name="description" content="Buy premium digital products, earn affiliate commissions, track your wallet, and build your professional CV — all in one place. Nigeria's most trusted digital store.">
+<meta name="description" content="Buy premium digital products, earn 50% affiliate commissions, track your wallet, build your CV — Nigeria's most trusted digital platform. No PayPal needed.">
+<meta property="og:title" content="NeyoDigitals — Earn Online From Nigeria">
+<meta property="og:description" content="Premium digital products + 50% affiliate program. Start earning from your phone today.">
+<meta property="og:url" content="https://amehmike1-2-3.github.io/My-Portfolio/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D0D0D'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='40' font-weight='bold' fill='%23C9A84C'%3EN%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+
+<!-- ══ FIREBASE ANALYTICS ══ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+  import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-analytics.js";
+
+  // 🔧 REPLACE THESE WITH YOUR FIREBASE CONFIG
+  // Go to: Firebase Console → Project Settings → Your Apps → Web App → Config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+  // Track page view
+  logEvent(analytics, 'page_view', { page: window.location.pathname });
+
+  // Expose analytics globally so inline handlers can use it
+  window.fbAnalytics = analytics;
+  window.fbLog = logEvent;
+
+  // Track affiliate button
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // Affiliate CTA button
+    document.querySelector('#start-earning-btn')?.addEventListener('click', () => {
+      logEvent(analytics, 'affiliate_click', {
+        product: 'NeyoDigitals_Affiliate_Program',
+        time: new Date().toISOString()
+      });
+    });
+
+    // Sign up button
+    document.querySelector('#signup-btn')?.addEventListener('click', () => {
+      logEvent(analytics, 'signup_click', { page: window.location.pathname });
+    });
+
+    // Sign in button
+    document.querySelector('#login-btn')?.addEventListener('click', () => {
+      logEvent(analytics, 'login_click', { page: window.location.pathname });
+    });
+
+    // Track all product buy buttons
+    document.querySelectorAll('.track-buy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        logEvent(analytics, 'product_click', {
+          product: btn.dataset.product || 'unknown',
+          price: btn.dataset.price || '0'
+        });
+      });
+    });
+
+    // Track scroll depth
+    let maxScroll = 0;
+    window.addEventListener('scroll', () => {
+      const pct = Math.round((scrollY / (document.body.scrollHeight - innerHeight)) * 100);
+      if (pct > maxScroll && pct % 25 === 0) {
+        maxScroll = pct;
+        logEvent(analytics, 'scroll_depth', { percent: pct });
+      }
+    });
+  });
+</script>
+
 <style>
-/* ═══════════════════════════════════════
-   TOKENS
-═══════════════════════════════════════ */
+/* ═══════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════ */
 :root{
-  --gold:#C9A84C;--gold2:#E8C97A;--glow:rgba(201,168,76,.4);
-  --bg:#0D0D0D;--bg2:#141414;--bg3:#1C1C1C;--bg4:#242424;
-  --cream:#FAF7F2;--muted:#8A8A8A;--border:rgba(201,168,76,.2);
-  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;
-  --shadow:0 8px 40px rgba(0,0,0,.6);
-  --tr:.32s cubic-bezier(.4,0,.2,1);
+  --gold:#C9A84C;--gold2:#E8C97A;--glow:rgba(201,168,76,.38);
+  --bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--bg4:#222;--bg5:#2A2A2A;
+  --cream:#FAF7F2;--muted:#7A7A7A;--border:rgba(201,168,76,.18);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --shadow:0 12px 50px rgba(0,0,0,.7);
+  --tr:.3s cubic-bezier(.4,0,.2,1);
+  --radius:0px;
 }
 [data-theme="light"]{
-  --bg:#F4EFE6;--bg2:#EDE6D8;--bg3:#E3DAC8;--bg4:#D8CEB8;
-  --cream:#111;--muted:#555;--border:rgba(201,168,76,.3);--shadow:0 8px 40px rgba(0,0,0,.1);
+  --bg:#F2EDE0;--bg2:#EAE3D0;--bg3:#E0D8C4;--bg4:#D4CCBA;--bg5:#C8C0AE;
+  --cream:#0D0D0D;--muted:#555;--border:rgba(201,168,76,.28);--shadow:0 8px 32px rgba(0,0,0,.1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--cream);overflow-x:hidden;transition:background var(--tr),color var(--tr);}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 a{text-decoration:none;color:inherit;}
-button{cursor:pointer;}
-input,textarea,select{font-family:'DM Sans',sans-serif;}
+button,input,textarea,select{font-family:inherit;}
+img{display:block;max-width:100%;}
 
-/* ═══ MODAL BASE ═══ */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;padding:20px;}
-.modal-bg.open{opacity:1;pointer-events:all;}
-.modal{background:var(--bg2);border:1px solid var(--border);max-width:520px;width:100%;padding:44px 40px;position:relative;transform:translateY(24px);transition:transform .35s;max-height:90vh;overflow-y:auto;}
-.modal-bg.open .modal{transform:translateY(0);}
-.modal.wide{max-width:860px;}
-.mcl{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:1.4rem;line-height:1;transition:color .3s;}
-.mcl:hover{color:var(--gold);}
-.mtag{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-.mtitle{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:var(--cream);line-height:1.2;margin-bottom:8px;}
-.mtitle em{font-style:italic;color:var(--gold);}
-.msub{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:28px;}
-.mline{width:1px;height:1px;background:var(--border);margin:20px 0;}
-.form-group{margin-bottom:16px;}
-.form-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block;}
-.form-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--cream);padding:13px 16px;font-size:.86rem;outline:none;transition:border-color .3s;}
-.form-input:focus{border-color:var(--gold);}
-.form-input::placeholder{color:var(--muted);}
-textarea.form-input{resize:vertical;min-height:80px;}
-.btn-gold{background:var(--gold);color:#0D0D0D;border:none;padding:14px 32px;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;transition:all .32s;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px;}
-.btn-gold:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 10px 30px rgba(201,168,76,.3);}
-.btn-outline{border:1px solid var(--border);color:var(--cream);background:transparent;padding:13px 28px;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;transition:all .32s;font-family:'DM Sans',sans-serif;}
+/* ── NOISE OVERLAY ── */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;transition:all var(--tr);}
+.btn-gold{background:var(--gold);color:#0A0A0A;}
+.btn-gold:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 10px 28px rgba(201,168,76,.32);}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--cream);}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-ghost{background:rgba(201,168,76,.08);border:1px solid var(--border);color:var(--gold);}
+.btn-ghost:hover{background:rgba(201,168,76,.15);}
 .btn-sm{padding:8px 18px;font-size:.7rem;}
-.btn-red{background:var(--red);color:#fff;border:none;padding:10px 20px;font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-family:'DM Sans',sans-serif;}
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:.75rem;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.or-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-.social-auth{background:var(--bg3);border:1px solid var(--border);color:var(--cream);padding:11px;font-size:.76rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s;}
-.social-auth:hover{border-color:var(--gold);}
-.switch-auth{font-size:.8rem;color:var(--muted);text-align:center;margin-top:16px;}
-.switch-auth a{color:var(--gold);}
-.auth-user{display:none;align-items:center;gap:10px;}
-.auth-user.show{display:flex;}
-.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#0D0D0D;}
-.user-name{font-size:.8rem;color:var(--cream);}
+.btn-lg{padding:16px 40px;font-size:.84rem;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{opacity:.88;}
+.btn-red{background:var(--red);color:#fff;}
 
-/* ═══ TRUST BANNER ═══ */
-.trust-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 60px;display:flex;align-items:center;justify-content:space-between;font-size:.7rem;color:var(--muted);}
-.trust-item{display:flex;align-items:center;gap:6px;}
-.trust-item span:first-child{font-size:.9rem;}
+/* ── MODAL SYSTEM ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1600;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity var(--tr);}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border);width:100%;max-width:500px;padding:40px 36px;position:relative;transform:translateY(20px);transition:transform var(--tr);max-height:90vh;overflow-y:auto;scrollbar-width:thin;}
+.overlay.open .modal{transform:translateY(0);}
+.modal.wide{max-width:900px;}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:1.4rem;line-height:1;cursor:pointer;transition:color var(--tr);}
+.modal-close:hover{color:var(--gold);}
+.label{font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:block;}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.85rem;font-weight:300;color:var(--cream);line-height:1.2;margin-bottom:6px;}
+.modal-title em{font-style:italic;color:var(--gold);}
+.modal-sub{font-size:.82rem;color:var(--muted);line-height:1.65;margin-bottom:24px;}
+.field{margin-bottom:14px;}
+.field label{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block;}
+.input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--cream);padding:12px 15px;font-size:.85rem;outline:none;transition:border-color var(--tr);}
+.input:focus{border-color:var(--gold);}
+.input::placeholder{color:var(--muted);}
+textarea.input{resize:vertical;min-height:76px;}
+.or-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.social-btn{background:var(--bg3);border:1px solid var(--border);color:var(--cream);padding:11px;font-size:.74rem;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all var(--tr);}
+.social-btn:hover{border-color:var(--gold);}
+.divider-line{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:.72rem;}
+.divider-line::before,.divider-line::after{content:'';flex:1;height:1px;background:var(--border);}
+.switch-link{font-size:.78rem;color:var(--muted);text-align:center;margin-top:14px;}
+.switch-link a{color:var(--gold);cursor:pointer;}
+
+/* ── SECTION HELPERS ── */
+.sh{text-align:center;margin-bottom:52px;}
+.sh.left{text-align:left;}
+.sh .tag{display:inline-block;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.sh h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.75rem,3.5vw,2.8rem);font-weight:300;color:var(--cream);line-height:1.15;}
+.sh h2 em{font-style:italic;color:var(--gold);}
+.sh p{font-size:.88rem;color:var(--muted);line-height:1.72;margin-top:12px;max-width:560px;margin-left:auto;margin-right:auto;}
+.sh.left p{margin-left:0;}
+.sh-line{width:38px;height:1px;background:var(--gold);margin:16px auto 0;opacity:.5;}
+.sh.left .sh-line{margin-left:0;}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.on{opacity:1;transform:translateY(0);}
+.container{max-width:1260px;margin:0 auto;padding:0 60px;}
+
+/* ═══ TRUST BAR ═══ */
+.trust-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 60px;display:flex;align-items:center;justify-content:space-between;font-size:.68rem;color:var(--muted);gap:12px;}
+.titem{display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.titem .ticon{font-size:.85rem;}
 
 /* ═══ COUNTDOWN ═══ */
-.cbanner{background:linear-gradient(90deg,#6b1010,var(--gold),#6b1010);background-size:200%;animation:shimmer 5s linear infinite;padding:11px 20px;text-align:center;font-size:.75rem;color:#fff;letter-spacing:.06em;}
+.countdown{background:linear-gradient(90deg,#5c0e0e,var(--gold),#5c0e0e);background-size:200%;animation:shimmer 5s linear infinite;padding:11px 20px;text-align:center;font-size:.74rem;color:#fff;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.countdown a{color:#fff;text-decoration:underline;font-weight:600;}
+.t-block{background:rgba(0,0,0,.38);padding:2px 8px;font-weight:700;font-size:.8rem;min-width:30px;text-align:center;display:inline-block;border-radius:2px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.tb{background:rgba(0,0,0,.4);padding:2px 8px;font-weight:700;font-size:.82rem;min-width:30px;text-align:center;display:inline-block;}
 
 /* ═══ NAV ═══ */
-nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 60px;background:rgba(13,13,13,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);transition:background var(--tr);}
-[data-theme="light"] nav{background:rgba(244,239,230,.97);}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;letter-spacing:.04em;color:var(--gold);}
-.nav-logo span{color:var(--cream);font-weight:300;font-style:italic;}
+nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 60px;background:rgba(10,10,10,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--border);transition:background var(--tr);}
+[data-theme="light"] nav{background:rgba(242,237,224,.97);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;letter-spacing:.04em;color:var(--gold);}
+.logo span{color:var(--cream);font-weight:300;font-style:italic;}
 .nav-links{display:flex;gap:22px;list-style:none;}
-.nav-links a{color:var(--muted);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
+.nav-links a{color:var(--muted);font-size:.73rem;letter-spacing:.1em;text-transform:uppercase;transition:color var(--tr);}
 .nav-links a:hover{color:var(--gold);}
-.nav-right{display:flex;align-items:center;gap:10px;}
-.icon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--cream);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;transition:all .3s;}
-.icon-btn:hover{border-color:var(--gold);color:var(--gold);}
-.curr-btn{background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:5px 13px;font-size:.68rem;font-weight:600;transition:all .3s;}
+.nav-right{display:flex;align-items:center;gap:9px;}
+.icon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--cream);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all var(--tr);cursor:pointer;}
+.icon-btn:hover{border-color:var(--gold);}
+.curr-btn{background:var(--bg3);border:1px solid var(--border);color:var(--gold);padding:5px 12px;font-size:.67rem;font-weight:600;cursor:pointer;transition:all var(--tr);}
 .curr-btn:hover{border-color:var(--gold);}
-.nav-cta{background:var(--gold);color:#0D0D0D;padding:9px 20px;font-size:.73rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:all .3s;border:1px solid var(--gold);}
-.nav-cta:hover{background:transparent;color:var(--gold);}
-.notif-badge{position:relative;}
+/* Auth states */
+#guestNav{display:flex;gap:8px;align-items:center;}
+#userNav{display:none;align-items:center;gap:9px;}
+#userNav.show{display:flex;}
+.u-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#0A0A0A;}
+.u-name{font-size:.78rem;color:var(--cream);}
+.notif{position:relative;}
 .notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg);}
 
 /* ═══ HERO ═══ */
 .hero{min-height:100vh;display:grid;place-items:center;padding:80px 60px;position:relative;overflow:hidden;text-align:center;}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(201,168,76,.12) 0%,transparent 70%);}
-.hero-ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.08);animation:pulse-ring 5s ease-in-out infinite;}
-.hero-ring:nth-child(1){width:420px;height:420px;top:50%;left:50%;transform:translate(-50%,-50%);}
-.hero-ring:nth-child(2){width:700px;height:700px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:1.5s;}
-.hero-ring:nth-child(3){width:1000px;height:1000px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:3s;}
-.hero-content{position:relative;z-index:2;max-width:900px;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);border:1px solid var(--border);padding:7px 20px;font-size:.67rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:28px;animation:fadeUp .8s .1s ease both;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 75% 55% at 50% 18%,rgba(201,168,76,.11) 0%,transparent 68%),radial-gradient(ellipse 35% 35% at 82% 78%,rgba(201,168,76,.06) 0%,transparent 60%);}
+/* Animated rings */
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(201,168,76,.08);animation:ringPulse 6s ease-in-out infinite;}
+.ring:nth-child(1){width:380px;height:380px;top:50%;left:50%;transform:translate(-50%,-50%);}
+.ring:nth-child(2){width:660px;height:660px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:1.5s;}
+.ring:nth-child(3){width:940px;height:940px;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:3s;}
+@keyframes ringPulse{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1);}50%{opacity:.08;transform:translate(-50%,-50%) scale(1.04);}}
+.hero-content{position:relative;z-index:2;max-width:880px;}
+/* Hero image mockup (CSS-only laptop illustration) */
+.hero-img-wrap{margin-bottom:36px;animation:fadeUp .9s .1s ease both;}
+.laptop-mockup{width:320px;height:200px;margin:0 auto;position:relative;}
+.laptop-screen{width:280px;height:165px;background:linear-gradient(160deg,var(--bg3),var(--bg4));border:2px solid var(--border);border-radius:10px 10px 0 0;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.laptop-screen::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.08),transparent 60%);}
+.screen-content{position:relative;z-index:1;text-align:center;}
+.screen-content .s-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--gold);margin-bottom:6px;}
+.screen-content .s-bar{height:4px;border-radius:2px;background:rgba(201,168,76,.4);margin:4px auto;}
+.screen-content .s-bar:nth-child(2){width:120px;}
+.screen-content .s-bar:nth-child(3){width:80px;}
+.screen-content .s-bar:nth-child(4){width:100px;}
+.screen-earn{position:absolute;top:16px;right:-20px;background:var(--green);color:#fff;font-size:.6rem;font-weight:700;padding:5px 9px;border-radius:20px;white-space:nowrap;animation:bounce 2s ease-in-out infinite;}
+.screen-notif{position:absolute;bottom:20px;left:-24px;background:var(--bg2);border:1px solid var(--border);color:var(--cream);font-size:.55rem;padding:5px 9px;border-radius:4px;white-space:nowrap;animation:bounce 2s ease-in-out infinite;animation-delay:.5s;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.laptop-base{width:300px;height:14px;background:linear-gradient(to bottom,var(--bg4),var(--bg5));border-radius:0 0 6px 6px;margin:0 auto;}
+.laptop-foot{width:240px;height:6px;background:var(--bg5);border-radius:0 0 20px 20px;margin:0 auto;}
+/* Floating badges */
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);border:1px solid var(--border);padding:7px 20px;font-size:.67rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:24px;animation:fadeUp .8s .2s ease both;}
 .hero-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);animation:blink 2s ease infinite;}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,6vw,5rem);font-weight:300;line-height:1.07;color:var(--cream);margin-bottom:10px;animation:fadeUp .8s .2s ease both;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,6vw,5rem);font-weight:300;line-height:1.07;color:var(--cream);margin-bottom:10px;animation:fadeUp .8s .3s ease both;}
 .hero-title em{font-style:italic;color:var(--gold);}
-.hero-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(.95rem,2vw,1.45rem);font-weight:300;color:var(--muted);margin-bottom:24px;animation:fadeUp .8s .3s ease both;}
-.hero-desc{font-size:.94rem;color:rgba(250,247,242,.6);line-height:1.8;max-width:580px;margin:0 auto 44px;animation:fadeUp .8s .4s ease both;}
-[data-theme="light"] .hero-desc{color:rgba(17,17,17,.55);}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .5s ease both;}
-/* Platform logos row */
-.platform-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:48px;animation:fadeUp .8s .6s ease both;}
-.platform-badge{background:var(--bg2);border:1px solid var(--border);padding:8px 18px;font-size:.68rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:6px;transition:all .3s;}
-.platform-badge:hover{border-color:var(--gold);color:var(--gold);}
-.platform-badge span:first-child{font-size:1rem;}
+.hero-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(.95rem,2vw,1.42rem);font-weight:300;color:var(--muted);margin-bottom:22px;animation:fadeUp .8s .4s ease both;}
+.hero-desc{font-size:.93rem;color:rgba(250,247,242,.58);line-height:1.82;max-width:600px;margin:0 auto 40px;animation:fadeUp .8s .5s ease both;}
+[data-theme="light"] .hero-desc{color:rgba(13,13,13,.56);}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .8s .55s ease both;}
+/* Trusted by row */
+.trusted-by{margin-top:48px;animation:fadeUp .8s .65s ease both;}
+.trusted-label{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.platform-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.platform-pill{background:var(--bg2);border:1px solid var(--border);padding:7px 16px;font-size:.66rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:6px;transition:all var(--tr);}
+.platform-pill:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ═══ STATS ═══ */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);}
-.si{background:var(--bg2);text-align:center;padding:36px 20px;transition:background .3s;}
-.si:hover{background:var(--bg3);}
-.sn{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:5px;}
-.sl{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.stat{background:var(--bg2);text-align:center;padding:36px 16px;transition:background var(--tr);}
+.stat:hover{background:var(--bg3);}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:5px;}
+.stat-l{font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);}
 
-/* ═══ TRUST BADGES SECTION ═══ */
-.trust-section{padding:60px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.trust-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;max-width:1200px;margin:0 auto;}
-.trust-card{background:var(--bg3);border:1px solid var(--border);padding:20px 14px;text-align:center;transition:all .3s;}
-.trust-card:hover{border-color:var(--gold);transform:translateY(-3px);}
-.trust-icon{font-size:1.6rem;margin-bottom:8px;}
-.trust-title{font-size:.72rem;font-weight:600;color:var(--cream);letter-spacing:.06em;margin-bottom:3px;}
-.trust-desc{font-size:.64rem;color:var(--muted);}
+/* ═══ TRUST CARDS ═══ */
+.trust-cards{padding:52px 60px;background:var(--bg2);border-bottom:1px solid var(--border);}
+.tc-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;max-width:1200px;margin:0 auto;}
+.tc-card{background:var(--bg3);border:1px solid var(--border);padding:18px 12px;text-align:center;transition:all var(--tr);}
+.tc-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+.tc-icon{font-size:1.55rem;margin-bottom:7px;}
+.tc-title{font-size:.7rem;font-weight:600;color:var(--cream);margin-bottom:2px;}
+.tc-desc{font-size:.62rem;color:var(--muted);}
 
 /* ═══ MARQUEE ═══ */
-.mstrip{background:var(--gold);padding:13px 0;overflow:hidden;}
-.mtrack{display:flex;gap:40px;animation:marquee 24s linear infinite;white-space:nowrap;}
-.mitem{font-size:.67rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#0D0D0D;display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.mitem::after{content:'✦';opacity:.4;}
+.marquee{background:var(--gold);padding:13px 0;overflow:hidden;}
+.marquee-track{display:flex;gap:40px;animation:mq 26s linear infinite;white-space:nowrap;}
+.marquee-item{font-size:.66rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#0A0A0A;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.marquee-item::after{content:'✦';opacity:.38;}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 
 /* ═══ SEARCH + FILTER ═══ */
-.search-zone{padding:56px 60px 0;max-width:1300px;margin:0 auto;}
-.srow{display:flex;margin-bottom:16px;}
-.sinput{flex:1;background:var(--bg2);border:1px solid var(--border);border-right:none;color:var(--cream);padding:13px 18px;font-size:.86rem;outline:none;transition:border-color .3s;}
-.sinput:focus{border-color:var(--gold);}
-.sinput::placeholder{color:var(--muted);}
-.sbtn{background:var(--gold);color:#0D0D0D;border:none;padding:13px 24px;font-size:.76rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
-.ftabs{display:flex;gap:7px;flex-wrap:wrap;}
-.ftab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 16px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;transition:all .3s;font-family:'DM Sans',sans-serif;}
-.ftab.active,.ftab:hover{background:var(--gold);border-color:var(--gold);color:#0D0D0D;}
-
-/* ═══ SECTION HEADER ═══ */
-.sh{text-align:center;margin-bottom:56px;}
-.stag{display:inline-block;font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-.stitle{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3.6vw,2.8rem);font-weight:300;color:var(--cream);line-height:1.14;}
-.stitle em{font-style:italic;color:var(--gold);}
-.sline{width:40px;height:1px;background:var(--gold);margin:16px auto 0;opacity:.5;}
+.search-zone{padding:52px 60px 0;max-width:1260px;margin:0 auto;}
+.search-row{display:flex;margin-bottom:16px;}
+.s-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-right:none;color:var(--cream);padding:13px 18px;font-size:.86rem;outline:none;transition:border-color var(--tr);}
+.s-inp:focus{border-color:var(--gold);}
+.s-inp::placeholder{color:var(--muted);}
+.s-btn{background:var(--gold);color:#0A0A0A;border:none;padding:13px 24px;font-size:.76rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;}
+.ftab{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 16px;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;cursor:pointer;transition:all var(--tr);}
+.ftab.active,.ftab:hover{background:var(--gold);border-color:var(--gold);color:#0A0A0A;}
 
 /* ═══ PRODUCTS ═══ */
-.pwrap{padding:52px 60px 100px;max-width:1300px;margin:0 auto;}
-.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.products{padding:50px 60px 100px;max-width:1260px;margin:0 auto;}
+.p-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 .pc{background:var(--bg2);border:1px solid var(--border);overflow:hidden;transition:transform var(--tr),border-color var(--tr),box-shadow var(--tr);display:flex;flex-direction:column;}
-.pc:hover{transform:scale(1.025) translateY(-4px);border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.25),0 20px 60px rgba(201,168,76,.12),var(--shadow);}
+.pc:hover{transform:scale(1.025) translateY(-4px);border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,168,76,.22),0 20px 56px rgba(201,168,76,.13),var(--shadow);}
 .pc.hidden{display:none;}
-.pimg{height:180px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+/* Product image with CSS 3D mockups */
+.pimg{height:175px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
 .pibg{position:absolute;inset:0;}
-.pg1{background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.04));}
-.pg2{background:linear-gradient(135deg,rgba(100,160,255,.2),rgba(201,168,76,.04));}
-.pg3{background:linear-gradient(135deg,rgba(76,200,160,.2),rgba(201,168,76,.04));}
-.pg4{background:linear-gradient(135deg,rgba(200,100,255,.2),rgba(201,168,76,.04));}
-.pg5{background:linear-gradient(135deg,rgba(255,150,80,.2),rgba(201,168,76,.04));}
-.pg6{background:linear-gradient(135deg,rgba(80,200,255,.2),rgba(201,168,76,.04));}
+.g1{background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.04));}
+.g2{background:linear-gradient(135deg,rgba(100,160,255,.2),rgba(201,168,76,.04));}
+.g3{background:linear-gradient(135deg,rgba(76,200,160,.2),rgba(201,168,76,.04));}
+.g4{background:linear-gradient(135deg,rgba(200,100,255,.2),rgba(201,168,76,.04));}
+.g5{background:linear-gradient(135deg,rgba(255,150,80,.2),rgba(201,168,76,.04));}
+.g6{background:linear-gradient(135deg,rgba(80,200,255,.2),rgba(201,168,76,.04));}
 /* 3D Book */
-.book3d{position:relative;z-index:2;transform:perspective(360px) rotateY(-18deg);filter:drop-shadow(0 12px 24px rgba(0,0,0,.55));}
-.bcover{width:86px;height:112px;border-radius:2px 6px 6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;text-align:center;box-shadow:inset -5px 0 10px rgba(0,0,0,.25),4px 4px 0 rgba(0,0,0,.35);}
-.bcover .bico{font-size:1.5rem;margin-bottom:5px;}
-.bcover .btxt{font-family:'Cormorant Garamond',serif;font-size:.52rem;font-weight:600;color:rgba(255,255,255,.9);line-height:1.3;text-shadow:0 1px 2px rgba(0,0,0,.5);}
-/* Course mockup */
-.course3d{position:relative;z-index:2;width:115px;height:84px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.45);filter:drop-shadow(0 8px 16px rgba(0,0,0,.4));}
-.course3d .bico{font-size:1.5rem;margin-bottom:4px;}
-.course3d .btxt{font-family:'Cormorant Garamond',serif;font-size:.52rem;color:rgba(255,255,255,.85);}
-/* Template mockup */
-.tmpl3d{position:relative;z-index:2;width:105px;height:80px;background:var(--bg4);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:9px;display:flex;flex-direction:column;gap:4px;box-shadow:0 6px 22px rgba(0,0,0,.5);}
+.book3d{position:relative;z-index:2;transform:perspective(340px) rotateY(-17deg);filter:drop-shadow(0 12px 22px rgba(0,0,0,.55));}
+.bcover{width:84px;height:110px;border-radius:2px 6px 6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;text-align:center;box-shadow:inset -5px 0 10px rgba(0,0,0,.25),4px 4px 0 rgba(0,0,0,.35);}
+.bico{font-size:1.45rem;margin-bottom:5px;}
+.btxt{font-family:'Cormorant Garamond',serif;font-size:.5rem;font-weight:600;color:rgba(255,255,255,.9);line-height:1.3;}
+/* Course */
+.course3d{position:relative;z-index:2;width:112px;height:82px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:11px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.45);filter:drop-shadow(0 8px 16px rgba(0,0,0,.4));}
+/* Template */
+.tmpl3d{position:relative;z-index:2;width:102px;height:78px;background:var(--bg4);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:9px;display:flex;flex-direction:column;gap:4px;box-shadow:0 6px 22px rgba(0,0,0,.5);}
 .tl{height:5px;border-radius:2px;background:rgba(201,168,76,.55);}
-.tl:nth-child(2){width:80%;background:rgba(255,255,255,.18);}
-.tl:nth-child(3){width:62%;background:rgba(255,255,255,.13);}
-.tl:nth-child(4){width:76%;background:rgba(255,255,255,.13);}
-.tl:nth-child(5){width:48%;background:rgba(255,255,255,.09);}
+.tl:nth-child(2){width:78%;background:rgba(255,255,255,.17);}
+.tl:nth-child(3){width:60%;background:rgba(255,255,255,.12);}
+.tl:nth-child(4){width:74%;background:rgba(255,255,255,.12);}
+.tl:nth-child(5){width:45%;background:rgba(255,255,255,.08);}
 /* Badges */
-.pbadge{position:absolute;top:13px;left:13px;z-index:3;font-size:.57rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;}
-.b-gold{background:var(--gold);color:#0D0D0D;}
+.pbadge{position:absolute;top:13px;left:13px;z-index:3;font-size:.56rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;}
+.b-gold{background:var(--gold);color:#0A0A0A;}
 .b-red{background:#dc2626;color:#fff;}
 .b-green{background:#16a34a;color:#fff;}
 .b-purple{background:#7c3aed;color:#fff;}
-.b-blue{background:#2563eb;color:#fff;}
-.mini-stars{position:absolute;bottom:9px;right:12px;z-index:3;color:var(--gold);font-size:.6rem;letter-spacing:1px;}
+.b-blue{background:#1d4ed8;color:#fff;}
+.mini-stars{position:absolute;bottom:9px;right:12px;z-index:3;color:var(--gold);font-size:.58rem;letter-spacing:1px;}
 /* Card body */
-.pbody{padding:19px 20px 22px;flex:1;display:flex;flex-direction:column;}
-.pcat{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
-.pname{font-family:'Cormorant Garamond',serif;font-size:1.18rem;font-weight:400;color:var(--cream);line-height:1.27;margin-bottom:8px;}
-.pdesc{font-size:.77rem;color:var(--muted);line-height:1.68;margin-bottom:14px;flex:1;}
+.pbody{padding:18px 20px 22px;flex:1;display:flex;flex-direction:column;}
+.pcat{font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.pname{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;color:var(--cream);line-height:1.27;margin-bottom:7px;}
+.pdesc{font-size:.76rem;color:var(--muted);line-height:1.68;margin-bottom:12px;flex:1;}
+.paff{font-size:.62rem;color:var(--green);font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:5px;}
 .pfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;}
-.pprice{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:400;color:var(--gold);}
-.porig{font-family:'DM Sans',sans-serif;font-size:.68rem;color:var(--muted);text-decoration:line-through;display:block;line-height:1.1;}
-.pbtn{background:transparent;border:1px solid var(--border);color:var(--cream);padding:7px 14px;font-size:.67rem;letter-spacing:.09em;text-transform:uppercase;transition:all .3s;font-family:'DM Sans',sans-serif;}
-.pbtn:hover{background:var(--gold);border-color:var(--gold);color:#0D0D0D;}
-.aff-tag{font-size:.6rem;color:var(--green);font-weight:600;margin-top:4px;}
+.pprice{font-family:'Cormorant Garamond',serif;font-size:1.32rem;font-weight:400;color:var(--gold);}
+.porig{font-size:.66rem;color:var(--muted);text-decoration:line-through;display:block;line-height:1.1;}
+.pbtn{background:transparent;border:1px solid var(--border);color:var(--cream);padding:7px 14px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;transition:all var(--tr);}
+.pbtn:hover{background:var(--gold);border-color:var(--gold);color:#0A0A0A;}
 .no-res{grid-column:1/-1;text-align:center;padding:50px;color:var(--muted);font-family:'Cormorant Garamond',serif;font-size:1.4rem;display:none;}
 
-/* ═══ WHY US ═══ */
-.why{padding:100px 60px;background:var(--bg2);}
-.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;max-width:1200px;margin:0 auto;background:var(--border);}
-.wi{background:var(--bg2);padding:40px 32px;transition:background .3s;}
-.wi:hover{background:var(--bg3);}
-.wi-ico{width:46px;height:46px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:18px;transition:border-color .3s;}
-.wi:hover .wi-ico{border-color:var(--gold);}
-.wi-title{font-family:'Cormorant Garamond',serif;font-size:1.12rem;color:var(--cream);margin-bottom:7px;}
-.wi-desc{font-size:.78rem;color:var(--muted);line-height:1.72;}
-.wi-stat{font-size:.68rem;color:var(--green);font-weight:600;margin-top:7px;}
-
-/* ═══ AFFILIATE PROGRAM ═══ */
+/* ═══ AFFILIATE SECTION ═══ */
 .aff-section{padding:100px 60px;background:var(--bg);}
-.aff-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:1100px;margin:0 auto;}
-.aff-info .sh{text-align:left;margin-bottom:28px;}
-.aff-info .sh .sline{margin-left:0;}
-.aff-steps{display:flex;flex-direction:column;gap:16px;margin-bottom:32px;}
-.aff-step{display:flex;gap:16px;align-items:flex-start;}
-.aff-num{width:36px;height:36px;background:rgba(201,168,76,.12);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);flex-shrink:0;}
-.aff-step-text h4{font-size:.88rem;font-weight:600;color:var(--cream);margin-bottom:3px;}
-.aff-step-text p{font-size:.78rem;color:var(--muted);line-height:1.65;}
-.aff-card{background:var(--bg2);border:1px solid var(--border);padding:40px;position:relative;overflow:hidden;}
-.aff-card::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);}
-.aff-rate{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:var(--gold);line-height:1;margin-bottom:6px;}
-.aff-rate span{font-size:1.5rem;}
-.aff-rate-label{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;}
-.aff-perks{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
-.aff-perk{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--cream);}
-.aff-perk::before{content:'✓';color:var(--green);font-weight:700;font-size:.8rem;}
-.aff-link-box{background:var(--bg3);border:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.aff-link-text{font-size:.74rem;color:var(--muted);font-family:monospace;}
-.copy-btn{background:var(--gold);color:#0D0D0D;border:none;padding:7px 14px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.aff-hero{background:linear-gradient(135deg,var(--bg2) 0%,var(--bg3) 100%);border:1px solid var(--border);padding:64px 56px;max-width:1100px;margin:0 auto;position:relative;overflow:hidden;}
+.aff-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1),transparent 70%);}
+.aff-hero::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,.06),transparent 70%);}
+.aff-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:2;}
+.aff-rate-big{font-family:'Cormorant Garamond',serif;font-size:5.5rem;font-weight:300;color:var(--gold);line-height:.9;margin-bottom:6px;}
+.aff-rate-big sup{font-size:2rem;vertical-align:top;margin-top:12px;}
+.aff-rate-label{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:24px;}
+.aff-bullets{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.aff-bullet{display:flex;align-items:flex-start;gap:12px;font-size:.84rem;color:var(--cream);}
+.aff-bullet-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.aff-bullet strong{color:var(--gold);}
+.aff-right{}
+.aff-steps-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--cream);margin-bottom:20px;}
+.aff-steps{display:flex;flex-direction:column;gap:14px;}
+.aff-step{display:flex;gap:14px;align-items:flex-start;}
+.step-num{width:34px;height:34px;border-radius:50%;background:rgba(201,168,76,.12);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);flex-shrink:0;}
+.step-num.active{background:var(--gold);color:#0A0A0A;border-color:var(--gold);}
+.step-info h4{font-size:.84rem;font-weight:600;color:var(--cream);margin-bottom:2px;}
+.step-info p{font-size:.75rem;color:var(--muted);line-height:1.6;}
+.aff-link-preview{background:var(--bg);border:1px solid var(--border);padding:12px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:20px;}
+.aff-link-url{font-size:.7rem;color:var(--muted);font-family:monospace;}
+.copy-btn{background:var(--gold);color:#0A0A0A;border:none;padding:7px 14px;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;white-space:nowrap;}
+
+/* ═══ HOW IT WORKS ═══ */
+.how-section{padding:100px 60px;background:var(--bg2);}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1100px;margin:0 auto;}
+.how-card{background:var(--bg3);border:1px solid var(--border);padding:36px 28px;text-align:center;transition:all var(--tr);position:relative;}
+.how-card:hover{border-color:var(--gold);transform:translateY(-5px);}
+.how-icon-wrap{width:72px;height:72px;border-radius:50%;background:rgba(201,168,76,.1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 18px;transition:all var(--tr);}
+.how-card:hover .how-icon-wrap{background:rgba(201,168,76,.18);border-color:var(--gold);}
+.how-step{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.how-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--cream);margin-bottom:9px;}
+.how-desc{font-size:.78rem;color:var(--muted);line-height:1.7;}
+.how-arrow{position:absolute;top:50%;right:-14px;transform:translateY(-50%);color:var(--gold);font-size:1.4rem;z-index:2;}
+
+/* ═══ WHY US ═══ */
+.why-section{padding:100px 60px;background:var(--bg);}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;max-width:1200px;margin:0 auto;background:var(--border);}
+.wi{background:var(--bg);padding:40px 30px;transition:background var(--tr);}
+.wi:hover{background:var(--bg2);}
+.wi-ico{width:46px;height:46px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:18px;transition:border-color var(--tr);}
+.wi:hover .wi-ico{border-color:var(--gold);}
+.wi-t{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--cream);margin-bottom:7px;}
+.wi-d{font-size:.77rem;color:var(--muted);line-height:1.72;}
+.wi-s{font-size:.67rem;color:var(--green);font-weight:600;margin-top:7px;}
 
 /* ═══ TESTIMONIALS ═══ */
-.testi{padding:100px 60px;max-width:1200px;margin:0 auto;}
+.testi-section{padding:100px 60px;max-width:1200px;margin:0 auto;}
 .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-.tc{background:var(--bg2);border:1px solid var(--border);padding:32px;transition:all .3s;}
-.tc:hover{border-color:rgba(201,168,76,.4);transform:translateY(-4px);box-shadow:var(--shadow);}
-.tq{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--gold);opacity:.2;line-height:.5;margin-bottom:14px;}
-.tstars{color:var(--gold);font-size:.68rem;letter-spacing:3px;margin-bottom:11px;}
-.ttext{font-size:.83rem;color:rgba(250,247,242,.68);line-height:1.78;margin-bottom:20px;font-style:italic;}
-[data-theme="light"] .ttext{color:rgba(17,17,17,.62);}
+.tcard{background:var(--bg2);border:1px solid var(--border);padding:30px;transition:all var(--tr);}
+.tcard:hover{border-color:rgba(201,168,76,.4);transform:translateY(-4px);box-shadow:var(--shadow);}
+.tq{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--gold);opacity:.2;line-height:.5;margin-bottom:13px;}
+.tstars{color:var(--gold);font-size:.66rem;letter-spacing:3px;margin-bottom:11px;}
+.ttext{font-size:.82rem;color:rgba(250,247,242,.66);line-height:1.78;margin-bottom:18px;font-style:italic;}
+[data-theme="light"] .ttext{color:rgba(13,13,13,.6);}
 .tauthor{display:flex;align-items:center;gap:11px;}
-.tav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#0D0D0D;flex-shrink:0;}
+.tav{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#0A0A0A;flex-shrink:0;}
 .tname{font-size:.8rem;font-weight:600;color:var(--cream);}
-.trole{font-size:.66rem;color:var(--muted);}
-.tver{font-size:.6rem;color:var(--green);font-weight:600;margin-top:1px;}
+.trole{font-size:.65rem;color:var(--muted);}
+.tver{font-size:.6rem;color:var(--green);font-weight:600;}
 
 /* ═══ FAQ ═══ */
-.faq{padding:100px 60px;background:var(--bg2);}
-.flist{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:2px;}
-.fi{background:var(--bg3);border:1px solid var(--border);overflow:hidden;transition:border-color .3s;}
-.fi:hover{border-color:rgba(201,168,76,.32);}
-.fq{width:100%;background:none;border:none;color:var(--cream);text-align:left;padding:19px 24px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;transition:color .3s;}
+.faq-section{padding:100px 60px;background:var(--bg2);}
+.flist{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:2px;}
+.fi{background:var(--bg3);border:1px solid var(--border);overflow:hidden;transition:border-color var(--tr);}
+.fi:hover{border-color:rgba(201,168,76,.3);}
+.fq{width:100%;background:none;border:none;color:var(--cream);text-align:left;padding:19px 24px;font-size:.87rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;transition:color var(--tr);}
 .fq:hover{color:var(--gold);}
-.fq-ico{font-size:1.25rem;color:var(--gold);flex-shrink:0;transition:transform .32s;line-height:1;}
+.fq-ico{font-size:1.2rem;color:var(--gold);flex-shrink:0;transition:transform var(--tr);line-height:1;}
 .fi.open .fq-ico{transform:rotate(45deg);}
 .fa{max-height:0;overflow:hidden;transition:max-height .4s ease;}
-.fa p{padding:0 24px 18px;font-size:.82rem;color:var(--muted);line-height:1.8;}
+.fa p{padding:0 24px 18px;font-size:.81rem;color:var(--muted);line-height:1.8;}
 .fi.open .fa{max-height:300px;}
 
 /* ═══ NEWSLETTER ═══ */
-.nl{padding:80px 60px;text-align:center;position:relative;overflow:hidden;}
-.nl-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(201,168,76,.07) 0%,transparent 70%);}
-.nl-wrap{position:relative;z-index:2;max-width:520px;margin:0 auto;}
-.nl h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;color:var(--cream);margin-bottom:9px;}
-.nl h2 em{font-style:italic;color:var(--gold);}
-.nl p{font-size:.84rem;color:var(--muted);line-height:1.68;margin-bottom:26px;}
-.nl-form{display:flex;max-width:420px;margin:0 auto;}
-.nl-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-right:none;color:var(--cream);padding:12px 16px;font-size:.84rem;outline:none;transition:border-color .3s;}
+.nl-section{padding:80px 60px;text-align:center;position:relative;overflow:hidden;}
+.nl-bg{position:absolute;inset:0;background:radial-gradient(ellipse 58% 68% at 50% 50%,rgba(201,168,76,.07) 0%,transparent 70%);}
+.nl-wrap{position:relative;z-index:2;max-width:500px;margin:0 auto;}
+.nl-wrap h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.55rem,3vw,2.3rem);font-weight:300;color:var(--cream);margin-bottom:9px;}
+.nl-wrap h2 em{font-style:italic;color:var(--gold);}
+.nl-wrap p{font-size:.83rem;color:var(--muted);line-height:1.68;margin-bottom:24px;}
+.nl-form{display:flex;max-width:400px;margin:0 auto;}
+.nl-inp{flex:1;background:var(--bg2);border:1px solid var(--border);border-right:none;color:var(--cream);padding:12px 15px;font-size:.83rem;outline:none;transition:border-color var(--tr);}
 .nl-inp:focus{border-color:var(--gold);}
 .nl-inp::placeholder{color:var(--muted);}
-.nl-btn{background:var(--gold);color:#0D0D0D;border:none;padding:12px 20px;font-size:.74rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;font-family:'DM Sans',sans-serif;white-space:nowrap;}
-.nl-note{font-size:.68rem;color:var(--muted);margin-top:10px;}
+.nl-btn{background:var(--gold);color:#0A0A0A;border:none;padding:12px 20px;font-size:.73rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
+.nl-note{font-size:.66rem;color:var(--muted);margin-top:10px;}
 
 /* ═══ CTA ═══ */
-.cta{padding:120px 60px;text-align:center;position:relative;overflow:hidden;background:var(--bg2);border-top:1px solid var(--border);}
-.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(201,168,76,.08) 0%,transparent 70%);}
+.cta-section{padding:120px 60px;text-align:center;position:relative;overflow:hidden;background:var(--bg2);border-top:1px solid var(--border);}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 68% 68% at 50% 50%,rgba(201,168,76,.08) 0%,transparent 70%);}
 .cta-wrap{position:relative;z-index:2;}
-.cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,3.8rem);font-weight:300;color:var(--cream);line-height:1.1;margin-bottom:16px;}
+.cta-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,4.8vw,3.8rem);font-weight:300;color:var(--cream);line-height:1.1;margin-bottom:16px;}
 .cta-title em{font-style:italic;color:var(--gold);}
-.cta-sub{font-size:.94rem;color:var(--muted);max-width:440px;margin:0 auto 40px;}
-.cta-div{width:1px;height:50px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:0 auto 40px;}
+.cta-sub{font-size:.93rem;color:var(--muted);max-width:440px;margin:0 auto 40px;}
+.cta-div{width:1px;height:48px;background:linear-gradient(to bottom,transparent,var(--gold),transparent);margin:0 auto 40px;}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
 /* ═══ FOOTER ═══ */
-footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:36px;}
-.fbrand p{font-size:.79rem;color:var(--muted);line-height:1.72;max-width:230px;margin-top:13px;}
-.fcol h4{font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:15px;}
+footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;gap:36px;}
+.fbrand p{font-size:.78rem;color:var(--muted);line-height:1.72;max-width:230px;margin-top:12px;}
+.fcol h4{font-size:.63rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:15px;}
 .fcol ul{list-style:none;}
 .fcol li{margin-bottom:8px;}
-.fcol a{font-size:.79rem;color:var(--muted);transition:color .3s;}
+.fcol a{font-size:.78rem;color:var(--muted);transition:color var(--tr);}
 .fcol a:hover{color:var(--gold);}
 .socials{display:flex;gap:8px;margin-top:16px;}
-.soc{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .3s;}
+.soc{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.88rem;transition:all var(--tr);}
 .soc:hover{border-color:var(--gold);background:rgba(201,168,76,.08);}
-.fbot{background:var(--bg);border-top:1px solid var(--border);padding:18px 60px;display:flex;justify-content:space-between;align-items:center;font-size:.68rem;color:var(--muted);flex-wrap:wrap;gap:8px;}
+.fbot{background:var(--bg);border-top:1px solid var(--border);padding:18px 60px;display:flex;justify-content:space-between;align-items:center;font-size:.67rem;color:var(--muted);flex-wrap:wrap;gap:8px;}
 .fbot a{color:var(--gold);}
 
 /* ═══ FLOATERS ═══ */
-.wa-float{position:fixed;bottom:82px;right:24px;z-index:500;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);animation:wa-pulse 2.5s ease-in-out infinite;transition:transform .3s;}
-.wa-float:hover{transform:scale(1.1);animation:none;}
-.wa-float svg{width:25px;height:25px;fill:#fff;}
-.wa-tip{position:absolute;right:62px;background:var(--bg2);border:1px solid var(--border);color:var(--cream);font-size:.72rem;padding:5px 12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s;}
-.wa-float:hover .wa-tip{opacity:1;}
-@keyframes wa-pulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,.4);}50%{box-shadow:0 4px 32px rgba(37,211,102,.7);}}
-.btt{position:fixed;bottom:20px;right:24px;z-index:500;width:40px;height:40px;background:var(--gold);color:#0D0D0D;border:none;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;opacity:0;pointer-events:none;transition:all .4s;}
-.btt.show{opacity:1;pointer-events:all;}
-.btt:hover{transform:translateY(-3px);}
+.wa-btn{position:fixed;bottom:82px;right:24px;z-index:500;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);animation:waPulse 2.5s ease-in-out infinite;transition:transform var(--tr);}
+.wa-btn:hover{transform:scale(1.1);animation:none;}
+.wa-btn svg{width:24px;height:24px;fill:#fff;}
+.wa-tip{position:absolute;right:62px;background:var(--bg2);border:1px solid var(--border);color:var(--cream);font-size:.7rem;padding:5px 12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--tr);}
+.wa-btn:hover .wa-tip{opacity:1;}
+@keyframes waPulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,.4);}50%{box-shadow:0 4px 32px rgba(37,211,102,.7);}}
+.btt-btn{position:fixed;bottom:20px;right:24px;z-index:500;width:40px;height:40px;background:var(--gold);color:#0A0A0A;border:none;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;cursor:pointer;opacity:0;pointer-events:none;transition:all .4s;}
+.btt-btn.show{opacity:1;pointer-events:all;}
+.btt-btn:hover{transform:translateY(-3px);}
 
-/* ═══ DASHBOARD MODAL ═══ */
-.dash-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:28px;}
-.dtab{background:none;border:none;color:var(--muted);padding:11px 20px;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;font-family:'DM Sans',sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all .3s;}
+/* ═══ DASHBOARD ═══ */
+.dash-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:26px;overflow-x:auto;}
+.dtab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:10px 18px;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all var(--tr);}
 .dtab.active,.dtab:hover{color:var(--gold);border-bottom-color:var(--gold);}
 .dpanel{display:none;}
 .dpanel.active{display:block;}
-.wallet-balance{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);padding:28px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;}
-.wallet-balance::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);}
-.w-label{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
-.w-amount{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:300;color:var(--gold);line-height:1;}
-.w-sub{font-size:.72rem;color:var(--green);margin-top:4px;}
-.w-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
-.tx-list{display:flex;flex-direction:column;gap:8px;}
-.tx{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);}
-.tx-info{display:flex;flex-direction:column;}
-.tx-name{font-size:.8rem;color:var(--cream);}
-.tx-date{font-size:.66rem;color:var(--muted);}
-.tx-amt{font-size:.85rem;font-weight:600;}
-.tx-amt.plus{color:var(--green);}
-.tx-amt.minus{color:var(--red);}
-.aff-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
-.aff-stat-card{background:var(--bg3);border:1px solid var(--border);padding:16px;text-align:center;}
-.asc-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);}
-.asc-label{font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
-.ref-link{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.ref-url{font-size:.72rem;color:var(--muted);font-family:monospace;word-break:break-all;}
-.purchases-list{display:flex;flex-direction:column;gap:8px;}
-.purchase-item{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--bg3);border:1px solid var(--border);}
-.pi-name{font-size:.82rem;color:var(--cream);}
-.pi-date{font-size:.64rem;color:var(--muted);}
-.pi-btn{background:var(--gold);color:#0D0D0D;border:none;padding:5px 12px;font-size:.64rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.wallet-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);padding:26px;text-align:center;margin-bottom:18px;position:relative;overflow:hidden;}
+.wallet-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);}
+.w-lbl{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.w-amt{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:300;color:var(--gold);line-height:1;}
+.w-earn{font-size:.7rem;color:var(--green);margin-top:3px;}
+.w-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.tx-list{display:flex;flex-direction:column;gap:7px;}
+.tx{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);}
+.tx-info .tx-n{font-size:.78rem;color:var(--cream);}
+.tx-info .tx-d{font-size:.63rem;color:var(--muted);}
+.tx-amt{font-size:.82rem;font-weight:600;}
+.tx-amt.p{color:var(--green);}
+.tx-amt.m{color:var(--red);}
+.aff-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.aff-sc{background:var(--bg3);border:1px solid var(--border);padding:14px;text-align:center;}
+.aff-sc-n{font-family:'Cormorant Garamond',serif;font-size:1.75rem;color:var(--gold);}
+.aff-sc-l{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.ref-box{background:var(--bg3);border:1px solid var(--border);padding:13px 15px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ref-url{font-size:.7rem;color:var(--muted);font-family:monospace;word-break:break-all;}
+.purchases-list{display:flex;flex-direction:column;gap:7px;}
+.pitem{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);}
+.pitem-name{font-size:.8rem;color:var(--cream);}
+.pitem-date{font-size:.62rem;color:var(--muted);}
+.dl-btn{background:var(--gold);color:#0A0A0A;border:none;padding:5px 12px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;}
+/* CV Builder */
+.cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.cv-form{}
+.cv-preview{background:var(--bg);border:1px solid var(--border);padding:22px;}
+.cv-paper{background:#fff;color:#111;padding:26px;font-family:'DM Sans',sans-serif;}
+.cv-pname{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#111;margin-bottom:2px;}
+.cv-prole{font-size:.76rem;color:#666;margin-bottom:9px;}
+.cv-pcontact{font-size:.66rem;color:#888;margin-bottom:13px;display:flex;flex-wrap:wrap;gap:9px;}
+.cv-psec{margin-bottom:13px;}
+.cv-psec h4{font-size:.68rem;font-weight:700;color:#C9A84C;letter-spacing:.13em;text-transform:uppercase;border-bottom:1px solid #C9A84C;padding-bottom:3px;margin-bottom:7px;}
+.cv-psec p,.cv-psec li{font-size:.7rem;color:#333;line-height:1.63;}
+.cv-psec ul{padding-left:13px;}
+.cv-btns{display:flex;gap:8px;margin-top:14px;}
 
-/* ═══ CV BUILDER ═══ */
-.cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.cv-preview{background:var(--bg);border:1px solid var(--border);padding:24px;min-height:400px;position:relative;}
-.cv-preview-inner{background:#fff;color:#111;padding:28px;min-height:360px;font-family:'DM Sans',sans-serif;}
-.cv-name{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:#111;margin-bottom:2px;}
-.cv-role{font-size:.78rem;color:#666;margin-bottom:10px;}
-.cv-contact{font-size:.68rem;color:#888;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;}
-.cv-section{margin-bottom:14px;}
-.cv-section h4{font-size:.7rem;font-weight:700;color:#C9A84C;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid #C9A84C;padding-bottom:3px;margin-bottom:8px;}
-.cv-section p,.cv-section li{font-size:.72rem;color:#333;line-height:1.65;}
-.cv-section ul{padding-left:14px;}
-.cv-btn-row{display:flex;gap:8px;margin-top:16px;}
-
-/* ═══ ANIMATIONS ═══ */
-@keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse-ring{0%,100%{opacity:.4;transform:translate(-50%,-50%) scale(1);}50%{opacity:.1;transform:translate(-50%,-50%) scale(1.03);}}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-@keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease;}
-.reveal.on{opacity:1;transform:translateY(0);}
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1400;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;padding:20px;}
-.popup-overlay.open{opacity:1;pointer-events:all;}
-.popup-box{background:var(--bg2);border:1px solid var(--border);max-width:460px;width:100%;padding:44px 38px;position:relative;transform:translateY(22px);transition:transform .35s;text-align:center;}
-.popup-overlay.open .popup-box{transform:translateY(0);}
-.popup-close{position:absolute;top:13px;right:17px;background:none;border:none;color:var(--muted);font-size:1.35rem;cursor:pointer;line-height:1;}
-.popup-close:hover{color:var(--gold);}
-
-/* ═══ RESPONSIVE ═══ */
-@media(max-width:960px){
-  .trust-bar{display:none;}
-  nav{padding:12px 18px;} .nav-links{display:none;}
-  .hero{padding:70px 20px 60px;}
-  .stats{grid-template-columns:repeat(2,1fr);}
-  .trust-grid{grid-template-columns:repeat(3,1fr);}
-  .trust-section{padding:40px 20px;}
-  .search-zone{padding:40px 20px 0;}
-  .pwrap{padding:40px 20px 80px;} .pgrid{grid-template-columns:1fr;}
-  .why{padding:70px 20px;} .why-grid{grid-template-columns:1fr 1fr;}
-  .aff-section{padding:70px 20px;} .aff-grid{grid-template-columns:1fr;}
-  .testi{padding:70px 20px;} .tgrid{grid-template-columns:1fr;}
-  .faq{padding:70px 20px;}
-  .nl{padding:70px 20px;} .nl-form{flex-direction:column;} .nl-inp{border-right:1px solid var(--border);border-bottom:none;}
-  .cta{padding:80px 20px;}
-  footer{grid-template-columns:1fr 1fr;padding:36px 20px;gap:24px;}
-  .fbot{flex-direction:column;text-align:center;padding:14px 20px;}
-  .cv-grid{grid-template-columns:1fr;}
-  .aff-stats{grid-template-columns:1fr 1fr;}
-}
-@media(max-width:500px){
-  .why-grid{grid-template-columns:1fr;}
-  .stats{grid-template-columns:1fr;}
-  .trust-grid{grid-template-columns:repeat(2,1fr);}
-  footer{grid-template-columns:1fr;}
-  .w-actions{grid-template-columns:1fr;}
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
 
-<!-- ══════════ NEWSLETTER POPUP ══════════ -->
-<div class="popup-overlay" id="popup">
-  <div class="popup-box">
-    <button class="popup-close" onclick="closePopup()">&#10005;</button>
-    <div class="mtag">&#127381; Free Gift Inside</div>
-    <h2 class="mtitle" style="font-size:1.75rem;">Get My Free<br><em>Freelancer Starter Guide</em></h2>
-    <p class="msub">Join 1,000+ Nigerians already earning online. Enter your email and get instant access — completely free.</p>
-    <div id="popupFormWrap">
-      <input class="form-input" type="email" id="popupEmail" placeholder="Your email address..." style="margin-bottom:10px;">
-      <button class="btn-gold" style="width:100%;justify-content:center;" onclick="submitPopup()">Send Me the Free Guide &#127381;</button>
+<!-- ══════════ POPUP ══════════ -->
+<div class="overlay" id="popup">
+  <div class="modal">
+    <button class="modal-close" onclick="closeOverlay('popup')">&#10005;</button>
+    <div class="label">&#127381; Free Gift Inside</div>
+    <h2 class="modal-title">Get My Free<br><em>Freelancer Starter Guide</em></h2>
+    <p class="modal-sub">Join 1,000+ Nigerians earning online. Drop your email and get the free guide instantly — no strings.</p>
+    <div id="popupForm">
+      <input class="input" type="email" id="popupEmail" placeholder="Your email address..." style="margin-bottom:10px;">
+      <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="submitPopup()">Send Me the Free Guide &#127381;</button>
     </div>
-    <div id="popupOk" style="display:none;color:var(--gold);font-size:.9rem;padding:12px 0;">&#9989; Check your inbox! Your free guide is on its way &#127881;</div>
-    <div style="font-size:.68rem;color:var(--muted);margin-top:10px;">&#128274; No spam. 1,000+ already joined. Unsubscribe anytime.</div>
+    <div id="popupOk" style="display:none;color:var(--gold);font-size:.88rem;padding:10px 0;">&#9989; Check your inbox! On its way &#127881;</div>
+    <div style="font-size:.67rem;color:var(--muted);margin-top:10px;">&#128274; No spam. Unsubscribe anytime.</div>
   </div>
 </div>
 
 <!-- ══════════ AUTH MODALS ══════════ -->
-<!-- Sign In -->
-<div class="modal-bg" id="signinModal">
+<div class="overlay" id="loginModal">
   <div class="modal">
-    <button class="mcl" onclick="closeModal('signinModal')">&#10005;</button>
-    <div class="mtag">Welcome Back</div>
-    <h2 class="mtitle">Sign <em>In</em></h2>
-    <p class="msub">Access your dashboard, wallet, purchases and affiliate earnings.</p>
-    <div class="or-social">
-      <button class="social-auth" onclick="socialLogin('Google')">&#127758; Continue with Google</button>
-      <button class="social-auth" onclick="socialLogin('Facebook')">&#128512; Continue with Facebook</button>
+    <button class="modal-close" onclick="closeOverlay('loginModal')">&#10005;</button>
+    <div class="label">Welcome Back</div>
+    <h2 class="modal-title">Sign <em>In</em></h2>
+    <p class="modal-sub">Access your dashboard, wallet, purchases and affiliate earnings.</p>
+    <div class="or-row">
+      <button class="social-btn" onclick="socialAuth('Google')">&#127758; Google</button>
+      <button class="social-btn" onclick="socialAuth('Facebook')">&#128512; Facebook</button>
     </div>
-    <div class="divider">or sign in with email</div>
-    <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="loginEmail" placeholder="you@email.com"></div>
-    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••"></div>
-    <button class="btn-gold" style="width:100%;justify-content:center;margin-top:6px;" onclick="doLogin()">Sign In to My Account</button>
-    <div class="switch-auth">Don't have an account? <a href="#" onclick="switchModal('signinModal','signupModal')">Create one free</a></div>
+    <div class="divider-line">or sign in with email</div>
+    <div class="field"><label>Email</label><input class="input" type="email" id="loginEmail" placeholder="you@email.com"></div>
+    <div class="field"><label>Password</label><input class="input" type="password" id="loginPass" placeholder="••••••••"></div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px;" id="login-btn" onclick="doLogin()">Sign In to My Account</button>
+    <div class="switch-link">No account? <a onclick="switchOverlay('loginModal','signupModal')">Create one free</a></div>
   </div>
 </div>
 
-<!-- Sign Up -->
-<div class="modal-bg" id="signupModal">
+<div class="overlay" id="signupModal">
   <div class="modal">
-    <button class="mcl" onclick="closeModal('signupModal')">&#10005;</button>
-    <div class="mtag">Join NeyoDigitals</div>
-    <h2 class="mtitle">Create <em>Account</em></h2>
-    <p class="msub">Free forever. Get a wallet, referral link, and access to all purchased products.</p>
-    <div class="or-social">
-      <button class="social-auth" onclick="socialLogin('Google')">&#127758; Continue with Google</button>
-      <button class="social-auth" onclick="socialLogin('Facebook')">&#128512; Continue with Facebook</button>
+    <button class="modal-close" onclick="closeOverlay('signupModal')">&#10005;</button>
+    <div class="label">Join Free</div>
+    <h2 class="modal-title">Create <em>Account</em></h2>
+    <p class="modal-sub">Free forever. Get a wallet, referral link, CV builder and access to all your purchases.</p>
+    <div class="or-row">
+      <button class="social-btn" onclick="socialAuth('Google')">&#127758; Google</button>
+      <button class="social-btn" onclick="socialAuth('Facebook')">&#128512; Facebook</button>
     </div>
-    <div class="divider">or sign up with email</div>
-    <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="regName" placeholder="Your full name"></div>
-    <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="regEmail" placeholder="you@email.com"></div>
-    <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="regPass" placeholder="Min. 8 characters"></div>
-    <button class="btn-gold" style="width:100%;justify-content:center;margin-top:6px;" onclick="doRegister()">Create My Free Account</button>
-    <div class="switch-auth">Already have an account? <a href="#" onclick="switchModal('signupModal','signinModal')">Sign in</a></div>
+    <div class="divider-line">or sign up with email</div>
+    <div class="field"><label>Full Name</label><input class="input" type="text" id="regName" placeholder="Your full name"></div>
+    <div class="field"><label>Email</label><input class="input" type="email" id="regEmail" placeholder="you@email.com"></div>
+    <div class="field"><label>Password</label><input class="input" type="password" id="regPass" placeholder="Min. 8 characters"></div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px;" id="signup-btn" onclick="doRegister()">Create My Free Account</button>
+    <div class="switch-link">Already have one? <a onclick="switchOverlay('signupModal','loginModal')">Sign in</a></div>
   </div>
 </div>
 
-<!-- Dashboard Modal -->
-<div class="modal-bg" id="dashModal">
+<!-- ══════════ DASHBOARD ══════════ -->
+<div class="overlay" id="dashModal">
   <div class="modal wide">
-    <button class="mcl" onclick="closeModal('dashModal')">&#10005;</button>
-    <div class="mtag">My Account</div>
-    <h2 class="mtitle" id="dashTitle">Welcome, <em>User</em></h2>
+    <button class="modal-close" onclick="closeOverlay('dashModal')">&#10005;</button>
+    <div class="label">My Account</div>
+    <h2 class="modal-title" id="dashGreet">Welcome, <em>User</em></h2>
     <div class="dash-tabs">
-      <button class="dtab active" onclick="switchTab('wallet')">&#128184; Wallet</button>
-      <button class="dtab" onclick="switchTab('affiliate')">&#128279; Affiliate</button>
-      <button class="dtab" onclick="switchTab('purchases')">&#128230; Purchases</button>
-      <button class="dtab" onclick="switchTab('cv')">&#128196; CV Builder</button>
-      <button class="dtab" onclick="switchTab('profile')">&#128100; Profile</button>
+      <button class="dtab active" onclick="switchTab('wallet',this)">&#128184; Wallet</button>
+      <button class="dtab" onclick="switchTab('affiliate',this)">&#128279; Affiliate</button>
+      <button class="dtab" onclick="switchTab('purchases',this)">&#128230; Purchases</button>
+      <button class="dtab" onclick="switchTab('cv',this)">&#128196; CV Builder</button>
+      <button class="dtab" onclick="switchTab('profile',this)">&#128100; Profile</button>
     </div>
 
-    <!-- WALLET PANEL -->
+    <!-- WALLET -->
     <div class="dpanel active" id="panel-wallet">
-      <div class="wallet-balance">
-        <div class="w-label">Total Wallet Balance</div>
-        <div class="w-amount">&#8358;<span id="walletAmt">2,450</span></div>
-        <div class="w-sub">&#9650; &#8358;450 earned this week from referrals</div>
+      <div class="wallet-card">
+        <div class="w-lbl">Total Wallet Balance</div>
+        <div class="w-amt">&#8358;<span id="walletAmt">2,450</span></div>
+        <div class="w-earn">&#9650; &#8358;450 earned this week from commissions</div>
       </div>
-      <div class="w-actions">
-        <button class="btn-gold btn-sm" onclick="alert('Withdraw feature coming soon! Minimum withdrawal: ₦5,000')">&#8659; Withdraw Funds</button>
-        <button class="btn-outline btn-sm" onclick="alert('Share your referral link to earn more!')">&#128279; Earn More</button>
+      <div class="w-btns">
+        <button class="btn btn-green btn-sm" onclick="alert('Withdraw to Paystack/Payoneer coming soon! Min: ₦5,000')">&#8659; Withdraw Funds</button>
+        <button class="btn btn-outline btn-sm" onclick="switchTab('affiliate',document.querySelectorAll(\'.dtab\')[1])">&#128279; Earn More</button>
       </div>
-      <p style="font-size:.72rem;color:var(--muted);margin-bottom:12px;letter-spacing:.1em;text-transform:uppercase;">Recent Transactions</p>
+      <p style="font-size:.7rem;color:var(--muted);margin-bottom:11px;letter-spacing:.1em;text-transform:uppercase;">Recent Transactions</p>
       <div class="tx-list">
-        <div class="tx"><div class="tx-info"><span class="tx-name">Affiliate Commission — Affiliate Blueprint</span><span class="tx-date">Today, 2:14 PM</span></div><span class="tx-amt plus">+&#8358;750</span></div>
-        <div class="tx"><div class="tx-info"><span class="tx-name">Referral Bonus — Tunde signed up</span><span class="tx-date">Yesterday, 10:05 AM</span></div><span class="tx-amt plus">+&#8358;500</span></div>
-        <div class="tx"><div class="tx-info"><span class="tx-name">Affiliate Commission — Budget Planner</span><span class="tx-date">2 days ago</span></div><span class="tx-amt plus">+&#8358;1,200</span></div>
-        <div class="tx"><div class="tx-info"><span class="tx-name">Withdrawal to Paystack</span><span class="tx-date">3 days ago</span></div><span class="tx-amt minus">-&#8358;5,000</span></div>
+        <div class="tx"><div class="tx-info"><div class="tx-n">Affiliate Commission — Affiliate Blueprint</div><div class="tx-d">Today, 2:14 PM</div></div><span class="tx-amt p">+&#8358;750</span></div>
+        <div class="tx"><div class="tx-info"><div class="tx-n">Referral Bonus — New Sign-up</div><div class="tx-d">Yesterday, 10:05 AM</div></div><span class="tx-amt p">+&#8358;500</span></div>
+        <div class="tx"><div class="tx-info"><div class="tx-n">Commission — Budget Planner Sale</div><div class="tx-d">2 days ago</div></div><span class="tx-amt p">+&#8358;2,400</span></div>
+        <div class="tx"><div class="tx-info"><div class="tx-n">Withdrawal to Paystack</div><div class="tx-d">5 days ago</div></div><span class="tx-amt m">-&#8358;5,000</span></div>
       </div>
     </div>
 
-    <!-- AFFILIATE PANEL -->
+    <!-- AFFILIATE -->
     <div class="dpanel" id="panel-affiliate">
-      <div class="aff-stats">
-        <div class="aff-stat-card"><div class="asc-num">12</div><div class="asc-label">Referrals</div></div>
-        <div class="aff-stat-card"><div class="asc-num">&#8358;3,450</div><div class="asc-label">Earned</div></div>
-        <div class="aff-stat-card"><div class="asc-num">30%</div><div class="asc-label">Commission</div></div>
+      <div class="aff-stats-row">
+        <div class="aff-sc"><div class="aff-sc-n">12</div><div class="aff-sc-l">Total Referrals</div></div>
+        <div class="aff-sc"><div class="aff-sc-n">&#8358;3,650</div><div class="aff-sc-l">Total Earned</div></div>
+        <div class="aff-sc"><div class="aff-sc-n">50%</div><div class="aff-sc-l">Commission Rate</div></div>
       </div>
-      <p style="font-size:.72rem;color:var(--muted);margin-bottom:10px;letter-spacing:.1em;text-transform:uppercase;">Your Referral Link</p>
-      <div class="ref-link">
-        <span class="ref-url" id="refUrl">https://payhip.com/NeyoDigital?ref=USER123</span>
-        <button class="copy-btn" onclick="copyRef()">Copy</button>
-      </div>
-      <p style="font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:16px;">Share your link on WhatsApp, TikTok, or social media. Earn <strong style="color:var(--gold)">30% commission</strong> on every sale made through your link — paid directly to your wallet.</p>
+      <p style="font-size:.7rem;color:var(--muted);margin-bottom:9px;letter-spacing:.1em;text-transform:uppercase;">Your Unique Referral Link</p>
+      <div class="ref-box"><span class="ref-url" id="refUrl">https://payhip.com/NeyoDigital?ref=USER123</span><button class="copy-btn" onclick="copyRef()">Copy</button></div>
+      <p style="font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">Share your link anywhere and earn <strong style="color:var(--gold)">50% commission</strong> on every sale. Paid directly to your wallet.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button class="btn-gold btn-sm" onclick="shareWA()">&#128172; Share on WhatsApp</button>
-        <button class="btn-outline btn-sm" onclick="copyRef()">&#128203; Copy Link</button>
+        <button class="btn btn-gold btn-sm" onclick="shareWA()">&#128172; Share on WhatsApp</button>
+        <button class="btn btn-outline btn-sm" onclick="copyRef()">&#128203; Copy Link</button>
       </div>
     </div>
 
-    <!-- PURCHASES PANEL -->
+    <!-- PURCHASES -->
     <div class="dpanel" id="panel-purchases">
-      <p style="font-size:.72rem;color:var(--muted);margin-bottom:14px;letter-spacing:.1em;text-transform:uppercase;">My Purchased Products</p>
+      <p style="font-size:.7rem;color:var(--muted);margin-bottom:13px;letter-spacing:.1em;text-transform:uppercase;">My Purchased Products</p>
       <div class="purchases-list">
-        <div class="purchase-item"><div><div class="pi-name">&#128176; The Short-Form Affiliate Blueprint</div><div class="pi-date">Purchased: Jan 15, 2026</div></div><button class="pi-btn" onclick="alert('Redirecting to download...')">&#8659; Download</button></div>
-        <div class="purchase-item"><div><div class="pi-name">&#127942; LuxeSell Store Template</div><div class="pi-date">Purchased: Jan 20, 2026</div></div><button class="pi-btn" onclick="alert('Redirecting to download...')">&#8659; Download</button></div>
-        <div class="purchase-item"><div><div class="pi-name">&#129302; 60-Min Business Automation Stack</div><div class="pi-date">Purchased: Feb 3, 2026</div></div><button class="pi-btn" onclick="alert('Redirecting to download...')">&#8659; Download</button></div>
+        <div class="pitem"><div><div class="pitem-name">&#128176; The Short-Form Affiliate Blueprint</div><div class="pitem-date">Purchased: Jan 15, 2026</div></div><button class="dl-btn" onclick="alert('Downloading...')">&#8659; Download</button></div>
+        <div class="pitem"><div><div class="pitem-name">&#127942; LuxeSell Store Template</div><div class="pitem-date">Purchased: Jan 20, 2026</div></div><button class="dl-btn" onclick="alert('Downloading...')">&#8659; Download</button></div>
+        <div class="pitem"><div><div class="pitem-name">&#129302; AI Automation Stack</div><div class="pitem-date">Purchased: Feb 3, 2026</div></div><button class="dl-btn" onclick="alert('Downloading...')">&#8659; Download</button></div>
       </div>
-      <p style="font-size:.76rem;color:var(--muted);margin-top:16px;">&#8594; Browse the <a href="https://payhip.com/NeyoDigital" style="color:var(--gold);">full store</a> to buy more products.</p>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:14px;">&#8594; <a href="https://payhip.com/NeyoDigital" style="color:var(--gold)">Browse the full store</a> to buy more products.</p>
     </div>
 
-    <!-- CV BUILDER PANEL -->
+    <!-- CV BUILDER -->
     <div class="dpanel" id="panel-cv">
-      <p style="font-size:.72rem;color:var(--muted);margin-bottom:16px;letter-spacing:.1em;text-transform:uppercase;">Professional CV Builder — Fill in and Download</p>
+      <p style="font-size:.7rem;color:var(--muted);margin-bottom:14px;letter-spacing:.1em;text-transform:uppercase;">Professional CV Builder — Live Preview</p>
       <div class="cv-grid">
-        <div>
-          <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="cv-name" placeholder="Michael Ameh" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Job Title / Role</label><input class="form-input" id="cv-role" placeholder="Digital Entrepreneur | Web Developer" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cv-email" placeholder="you@email.com" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="cv-phone" placeholder="+234 907 221 2496" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="cv-loc" placeholder="Lafia, Nasarawa, Nigeria" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Professional Summary</label><textarea class="form-input" id="cv-summary" rows="3" placeholder="Results-driven digital entrepreneur with expertise in..." oninput="updateCV()"></textarea></div>
-          <div class="form-group"><label class="form-label">Key Skills (comma separated)</label><input class="form-input" id="cv-skills" placeholder="Web Development, Affiliate Marketing, Digital Sales" oninput="updateCV()"></div>
-          <div class="form-group"><label class="form-label">Work Experience</label><textarea class="form-input" id="cv-exp" rows="3" placeholder="Founder, NeyoDigitals (2025-Present)&#10;Built and launched a digital products store..." oninput="updateCV()"></textarea></div>
-          <div class="form-group"><label class="form-label">Education</label><input class="form-input" id="cv-edu" placeholder="Federal University Lafia — B.Sc Computer Science (2024-2028)" oninput="updateCV()"></div>
-        </div>
-        <div>
-          <div class="cv-preview">
-            <div class="cv-preview-inner" id="cvPreview">
-              <div class="cv-name" id="pvName">Michael Ameh</div>
-              <div class="cv-role" id="pvRole">Digital Entrepreneur | Web Developer</div>
-              <div class="cv-contact"><span id="pvEmail">me@email.com</span><span id="pvPhone">+234 907 221 2496</span><span id="pvLoc">Lafia, Nigeria</span></div>
-              <div class="cv-section"><h4>Profile</h4><p id="pvSummary">Results-driven digital entrepreneur building premium digital products for Nigeria's growing online market.</p></div>
-              <div class="cv-section"><h4>Skills</h4><p id="pvSkills">Web Development · Affiliate Marketing · Digital Sales · HTML/CSS · Content Strategy</p></div>
-              <div class="cv-section"><h4>Experience</h4><p id="pvExp" style="white-space:pre-line;">Founder, NeyoDigitals (2025–Present)&#10;Built and launched a digital products store earning consistent monthly revenue.</p></div>
-              <div class="cv-section"><h4>Education</h4><p id="pvEdu">Federal University Lafia — B.Sc Computer Science (2024–2028)</p></div>
-            </div>
+        <div class="cv-form">
+          <div class="field"><label>Full Name</label><input class="input" id="cv-name" placeholder="Michael Ameh" oninput="updateCV()"></div>
+          <div class="field"><label>Job Title</label><input class="input" id="cv-role" placeholder="Digital Entrepreneur | CS Student" oninput="updateCV()"></div>
+          <div class="field"><label>Email</label><input class="input" id="cv-email" placeholder="you@email.com" oninput="updateCV()"></div>
+          <div class="field"><label>Phone</label><input class="input" id="cv-phone" placeholder="+234 907 221 2496" oninput="updateCV()"></div>
+          <div class="field"><label>Location</label><input class="input" id="cv-loc" placeholder="Lafia, Nasarawa, Nigeria" oninput="updateCV()"></div>
+          <div class="field"><label>Summary</label><textarea class="input" id="cv-sum" rows="3" placeholder="Results-driven digital entrepreneur..." oninput="updateCV()"></textarea></div>
+          <div class="field"><label>Skills (comma separated)</label><input class="input" id="cv-skills" placeholder="Web Dev, Affiliate Marketing, HTML/CSS" oninput="updateCV()"></div>
+          <div class="field"><label>Experience</label><textarea class="input" id="cv-exp" rows="3" placeholder="Founder, NeyoDigitals (2025–Present)&#10;Launched a premium digital products store..." oninput="updateCV()"></textarea></div>
+          <div class="field"><label>Education</label><input class="input" id="cv-edu" placeholder="Federal University Lafia — B.Sc CS (2024–2028)" oninput="updateCV()"></div>
+          <div class="cv-btns">
+            <button class="btn btn-gold btn-sm" onclick="printCV()">&#128424; Download CV</button>
+            <button class="btn btn-outline btn-sm" onclick="resetCV()">&#8635; Reset</button>
           </div>
-          <div class="cv-btn-row">
-            <button class="btn-gold btn-sm" onclick="printCV()">&#128424; Download / Print CV</button>
-            <button class="btn-outline btn-sm" onclick="resetCV()">&#8635; Reset</button>
+        </div>
+        <div class="cv-preview">
+          <div class="cv-paper" id="cvPaper">
+            <div class="cv-pname" id="pvName">Michael Ameh</div>
+            <div class="cv-prole" id="pvRole">Digital Entrepreneur | Computer Science Student</div>
+            <div class="cv-pcontact"><span id="pvEmail">me@email.com</span><span id="pvPhone">+234 907 221 2496</span><span id="pvLoc">Lafia, Nigeria</span></div>
+            <div class="cv-psec"><h4>Profile</h4><p id="pvSum">Results-driven digital entrepreneur building premium digital products for Nigeria's growing online economy.</p></div>
+            <div class="cv-psec"><h4>Skills</h4><p id="pvSkills">Web Development &middot; HTML/CSS &middot; Affiliate Marketing &middot; Digital Sales &middot; Content Strategy</p></div>
+            <div class="cv-psec"><h4>Experience</h4><p id="pvExp" style="white-space:pre-line;">Founder, NeyoDigitals (2025–Present)&#10;Built and launched a digital products store generating consistent monthly revenue.</p></div>
+            <div class="cv-psec"><h4>Education</h4><p id="pvEdu">Federal University Lafia — B.Sc Computer Science (2024–2028)</p></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- PROFILE PANEL -->
+    <!-- PROFILE -->
     <div class="dpanel" id="panel-profile">
-      <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="prof-name" placeholder="Your full name"></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="prof-email" placeholder="your@email.com"></div>
-      <div class="form-group"><label class="form-label">WhatsApp Number</label><input class="form-input" id="prof-wa" placeholder="+234..."></div>
-      <div class="form-group"><label class="form-label">Country</label><input class="form-input" id="prof-country" value="Nigeria"></div>
+      <div class="field"><label>Full Name</label><input class="input" id="prf-name" placeholder="Your full name"></div>
+      <div class="field"><label>Email</label><input class="input" id="prf-email" placeholder="your@email.com"></div>
+      <div class="field"><label>WhatsApp</label><input class="input" id="prf-wa" placeholder="+234 907 221 2496"></div>
+      <div class="field"><label>Country</label><input class="input" id="prf-country" value="Nigeria"></div>
       <div style="display:flex;gap:10px;margin-top:4px;">
-        <button class="btn-gold btn-sm" onclick="saveProfile()">Save Changes</button>
-        <button class="btn-red btn-sm" onclick="doLogout()">Sign Out</button>
+        <button class="btn btn-gold btn-sm" onclick="alert('Profile saved! ✓')">Save Changes</button>
+        <button class="btn btn-red btn-sm" onclick="doLogout()">Sign Out</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══════════ TRUST BAR ══════════ -->
+<!-- ══════════ PAGE ══════════ -->
+
+<!-- Trust Bar -->
 <div class="trust-bar">
-  <div class="trust-item"><span>&#128274;</span><span>256-bit SSL Secured</span></div>
-  <div class="trust-item"><span>&#9889;</span><span>Instant Download</span></div>
-  <div class="trust-item"><span>&#9989;</span><span>Verified Seller on Payhip</span></div>
-  <div class="trust-item"><span>&#127474;&#127462;</span><span>Made in Nigeria</span></div>
-  <div class="trust-item"><span>&#128172;</span><span>24/7 WhatsApp Support</span></div>
+  <div class="titem"><span class="ticon">&#128274;</span>256-bit SSL Secured</div>
+  <div class="titem"><span class="ticon">&#9889;</span>Instant Download</div>
+  <div class="titem"><span class="ticon">&#9989;</span>Verified Payhip Seller</div>
+  <div class="titem"><span class="ticon">&#127475;&#127468;</span>Made in Nigeria</div>
+  <div class="titem"><span class="ticon">&#128279;</span>50% Affiliate Commission</div>
+  <div class="titem"><span class="ticon">&#128172;</span>24/7 WhatsApp Support</div>
 </div>
 
-<!-- ══════════ COUNTDOWN ══════════ -->
-<div class="cbanner">
-  &#128293; <strong>Flash Sale:</strong> Use code <strong>NEYO20</strong> for 20% OFF — ends in
-  <span class="tb" id="t-h">23</span>:<span class="tb" id="t-m">59</span>:<span class="tb" id="t-s">59</span>
-  &nbsp;|&nbsp; &#128176; Earn 30% commission on every referral sale — <a href="#" style="color:#fff;text-decoration:underline;" onclick="openAffiliate()">Join Affiliate Program</a>
+<!-- Countdown -->
+<div class="countdown">
+  &#128293; <strong>Flash Sale — 20% OFF:</strong> use code <strong>NEYO20</strong> at checkout &nbsp;|&nbsp; Ends in
+  <span class="t-block" id="t-h">23</span>:<span class="t-block" id="t-m">59</span>:<span class="t-block" id="t-s">59</span>
+  &nbsp;|&nbsp; <a href="#affiliate" onclick="trackAff()">Join Affiliate Program — Earn 50%</a>
 </div>
 
-<!-- ══════════ STICKY NAV ══════════ -->
+<!-- Sticky Nav -->
 <nav>
-  <a href="#" class="nav-logo">Neyo<span>Digitals</span></a>
+  <a href="#" class="logo">Neyo<span>Digitals</span></a>
   <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
     <li><a href="#products">Products</a></li>
-    <li><a href="#affiliate">Affiliate</a></li>
-    <li><a href="#why">Why Us</a></li>
+    <li><a href="#affiliate">Start Earning</a></li>
+    <li><a href="#how">How It Works</a></li>
     <li><a href="#reviews">Reviews</a></li>
-    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
     <button class="curr-btn" id="currBtn" onclick="toggleCurrency()">&#8358; NGN</button>
     <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">&#9790;</button>
-    <!-- Auth buttons -->
-    <div id="guestBtns" style="display:flex;gap:8px;">
-      <button class="btn-outline" style="padding:7px 16px;font-size:.72rem;" onclick="openModal('signinModal')">Sign In</button>
-      <button class="btn-gold" style="padding:8px 18px;font-size:.72rem;" onclick="openModal('signupModal')">Join Free</button>
+    <div id="guestNav">
+      <button class="btn btn-outline btn-sm" id="login-btn" onclick="openOverlay('loginModal')">Sign In</button>
+      <button class="btn btn-gold btn-sm" id="signup-btn" onclick="openOverlay('signupModal')">Join Free</button>
     </div>
-    <div class="auth-user" id="userBtns">
-      <div class="user-avatar" id="userAv">M</div>
-      <span class="user-name" id="userName">User</span>
-      <button class="nav-cta" onclick="openModal('dashModal')">Dashboard</button>
+    <div id="userNav">
+      <div class="u-avatar" id="uAv">M</div>
+      <span class="u-name" id="uName">User</span>
+      <button class="btn btn-gold btn-sm" onclick="openOverlay('dashModal')">Dashboard</button>
     </div>
   </div>
 </nav>
 
-<!-- ══════════ HERO ══════════ -->
-<section class="hero">
+<!-- HERO -->
+<section class="hero" id="home">
   <div class="hero-bg"></div>
-  <div class="hero-ring"></div><div class="hero-ring"></div><div class="hero-ring"></div>
+  <div class="ring"></div><div class="ring"></div><div class="ring"></div>
   <div class="hero-content">
+    <!-- CSS Laptop Mockup -->
+    <div class="hero-img-wrap">
+      <div class="laptop-mockup">
+        <div class="laptop-screen">
+          <div class="screen-content">
+            <div class="s-logo">NeyoDigitals</div>
+            <div class="s-bar" style="width:140px;"></div>
+            <div class="s-bar"></div>
+            <div class="s-bar"></div>
+          </div>
+          <div class="screen-earn">&#128176; +&#8358;18,000 earned!</div>
+          <div class="screen-notif">&#128279; 3 new referral sales today</div>
+        </div>
+        <div class="laptop-base"></div>
+        <div class="laptop-foot"></div>
+      </div>
+    </div>
     <div class="hero-badge">Nigeria&#8217;s #1 Digital Products Platform</div>
     <h1 class="hero-title">Stop Scrolling.<br><em>Start Earning.</em></h1>
-    <p class="hero-sub">eBooks &middot; Courses &middot; Templates &middot; Affiliate Program &middot; Wallet</p>
-    <p class="hero-desc">The exact tools, systems and guides real Nigerians use to earn online every day. Buy products, earn 30% affiliate commissions, build your CV, and track everything from your personal dashboard.</p>
+    <p class="hero-sub">eBooks &middot; Courses &middot; Templates &middot; 50% Affiliate Program &middot; Free Wallet</p>
+    <p class="hero-desc">Stop trading time for money. Buy proven digital products, share your referral link, and earn 50% commission on every single sale — from your phone, anywhere in Nigeria, with no PayPal required.</p>
     <div class="hero-btns">
-      <a href="#products" class="btn-gold">Explore Products</a>
-      <button class="btn-outline" onclick="openModal('signupModal')">Create Free Account</button>
+      <a href="#products" class="btn btn-gold btn-lg">Explore All Products</a>
+      <button class="btn btn-outline btn-lg" id="start-earning-btn" onclick="openOverlay('signupModal');trackAff()">Start Earning Now &#128176;</button>
     </div>
-    <!-- Platform row -->
-    <div class="platform-row">
-      <span style="font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);">Trusted like:</span>
-      <div class="platform-badge"><span>🛒</span>Shopify</div>
-      <div class="platform-badge"><span>📦</span>eBay</div>
-      <div class="platform-badge"><span>🎓</span>Udemy</div>
-      <div class="platform-badge"><span>💳</span>Payhip</div>
-      <div class="platform-badge"><span>🌍</span>Gumroad</div>
-      <div class="platform-badge"><span>🔗</span>Fiverr</div>
+    <div class="trusted-by">
+      <div class="trusted-label">Trusted and modelled like the world&#8217;s top platforms</div>
+      <div class="platform-row">
+        <div class="platform-pill"><span>&#128717;</span>Shopify</div>
+        <div class="platform-pill"><span>&#128230;</span>eBay</div>
+        <div class="platform-pill"><span>&#127891;</span>Udemy</div>
+        <div class="platform-pill"><span>&#128179;</span>Payhip</div>
+        <div class="platform-pill"><span>&#127881;</span>Gumroad</div>
+        <div class="platform-pill"><span>&#128279;</span>Fiverr</div>
+        <div class="platform-pill"><span>&#128250;</span>YouTube</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ STATS ══════════ -->
+<!-- Stats -->
 <div class="stats">
-  <div class="si reveal"><div class="sn">9+</div><div class="sl">Products Available</div></div>
-  <div class="si reveal" style="transition-delay:.06s"><div class="sn">30%</div><div class="sl">Affiliate Commission</div></div>
-  <div class="si reveal" style="transition-delay:.12s"><div class="sn">&#8358;500</div><div class="sl">Starting Price</div></div>
-  <div class="si reveal" style="transition-delay:.18s"><div class="sn">24/7</div><div class="sl">WhatsApp Support</div></div>
-  <div class="si reveal" style="transition-delay:.24s"><div class="sn">100%</div><div class="sl">Instant Download</div></div>
+  <div class="stat reveal"><div class="stat-n">9+</div><div class="stat-l">Premium Products</div></div>
+  <div class="stat reveal" style="transition-delay:.06s"><div class="stat-n">50%</div><div class="stat-l">Affiliate Commission</div></div>
+  <div class="stat reveal" style="transition-delay:.12s"><div class="stat-n">&#8358;500</div><div class="stat-l">Starting Price</div></div>
+  <div class="stat reveal" style="transition-delay:.18s"><div class="stat-n">24/7</div><div class="stat-l">WhatsApp Support</div></div>
+  <div class="stat reveal" style="transition-delay:.24s"><div class="stat-n">100%</div><div class="stat-l">Instant Download</div></div>
 </div>
 
-<!-- ══════════ TRUST BADGES ══════════ -->
-<div class="trust-section">
-  <div class="trust-grid">
-    <div class="trust-card reveal"><div class="trust-icon">&#128274;</div><div class="trust-title">SSL Secured</div><div class="trust-desc">256-bit encryption on all transactions</div></div>
-    <div class="trust-card reveal" style="transition-delay:.05s"><div class="trust-icon">&#9889;</div><div class="trust-title">Instant Delivery</div><div class="trust-desc">Download in under 60 seconds</div></div>
-    <div class="trust-card reveal" style="transition-delay:.1s"><div class="trust-icon">&#127891;</div><div class="trust-title">Lifetime Access</div><div class="trust-desc">Free updates forever included</div></div>
-    <div class="trust-card reveal" style="transition-delay:.15s"><div class="trust-icon">&#128176;</div><div class="trust-title">Earn Commissions</div><div class="trust-desc">30% on every referral sale</div></div>
-    <div class="trust-card reveal" style="transition-delay:.2s"><div class="trust-icon">&#127475;&#127468;</div><div class="trust-title">Nigeria-Ready</div><div class="trust-desc">No PayPal required. Ever.</div></div>
-    <div class="trust-card reveal" style="transition-delay:.25s"><div class="trust-icon">&#9989;</div><div class="trust-title">Verified Seller</div><div class="trust-desc">Trusted Payhip verified store</div></div>
+<!-- Trust Cards -->
+<div class="trust-cards">
+  <div class="tc-grid">
+    <div class="tc-card reveal"><div class="tc-icon">&#128274;</div><div class="tc-title">SSL Secured</div><div class="tc-desc">256-bit encryption on all payments</div></div>
+    <div class="tc-card reveal" style="transition-delay:.04s"><div class="tc-icon">&#9889;</div><div class="tc-title">Instant Delivery</div><div class="tc-desc">Download in under 60 seconds</div></div>
+    <div class="tc-card reveal" style="transition-delay:.08s"><div class="tc-icon">&#128176;</div><div class="tc-title">50% Commission</div><div class="tc-desc">Highest affiliate rate in Nigeria</div></div>
+    <div class="tc-card reveal" style="transition-delay:.12s"><div class="tc-icon">&#127475;&#127468;</div><div class="tc-title">Nigeria-Ready</div><div class="tc-desc">No PayPal — ever. Use Paystack.</div></div>
+    <div class="tc-card reveal" style="transition-delay:.16s"><div class="tc-icon">&#127891;</div><div class="tc-title">Lifetime Access</div><div class="tc-desc">Free updates included forever</div></div>
+    <div class="tc-card reveal" style="transition-delay:.2s"><div class="tc-icon">&#9989;</div><div class="tc-title">Verified Seller</div><div class="tc-desc">Trusted Payhip verified store</div></div>
   </div>
 </div>
 
-<!-- ══════════ MARQUEE ══════════ -->
-<div class="mstrip">
-  <div class="mtrack">
-    <span class="mitem">Instant Download</span><span class="mitem">Nigeria-Ready</span><span class="mitem">30% Affiliate Commission</span><span class="mitem">No PayPal Needed</span><span class="mitem">Earn While You Sleep</span><span class="mitem">Lifetime Access</span><span class="mitem">Secure Checkout</span><span class="mitem">Free CV Builder</span>
-    <span class="mitem">Instant Download</span><span class="mitem">Nigeria-Ready</span><span class="mitem">30% Affiliate Commission</span><span class="mitem">No PayPal Needed</span><span class="mitem">Earn While You Sleep</span><span class="mitem">Lifetime Access</span><span class="mitem">Secure Checkout</span><span class="mitem">Free CV Builder</span>
+<!-- Marquee -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">Instant Download</span><span class="marquee-item">50% Affiliate Commission</span><span class="marquee-item">Nigeria-Ready</span><span class="marquee-item">No PayPal Needed</span><span class="marquee-item">Earn While You Sleep</span><span class="marquee-item">Free CV Builder</span><span class="marquee-item">Free Wallet</span><span class="marquee-item">Firebase Tracked</span>
+    <span class="marquee-item">Instant Download</span><span class="marquee-item">50% Affiliate Commission</span><span class="marquee-item">Nigeria-Ready</span><span class="marquee-item">No PayPal Needed</span><span class="marquee-item">Earn While You Sleep</span><span class="marquee-item">Free CV Builder</span><span class="marquee-item">Free Wallet</span><span class="marquee-item">Firebase Tracked</span>
   </div>
 </div>
 
-<!-- ══════════ SEARCH + FILTER ══════════ -->
+<!-- Search + Filter -->
 <div class="search-zone" id="products">
-  <div class="srow">
-    <input class="sinput" type="text" id="sinput" placeholder="Search products — e.g. affiliate, trading, budget, template...">
-    <button class="sbtn" onclick="doSearch()">Search</button>
+  <div class="search-row">
+    <input class="s-inp" type="text" id="sinput" placeholder="Search products — e.g. affiliate, trading, budget, template...">
+    <button class="s-btn" onclick="doSearch()">Search</button>
   </div>
-  <div class="ftabs">
+  <div class="filter-row">
     <button class="ftab active" onclick="filterP('all',this)">All (9)</button>
     <button class="ftab" onclick="filterP('ebook',this)">&#128218; eBooks</button>
     <button class="ftab" onclick="filterP('course',this)">&#127891; Courses</button>
@@ -690,236 +792,296 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px
   </div>
 </div>
 
-<!-- ══════════ PRODUCTS ══════════ -->
-<section class="pwrap">
+<!-- Products -->
+<section class="products">
   <div class="sh reveal">
-    <div class="stag">All Products</div>
-    <h2 class="stitle">Everything You Need to <em>Win Online</em></h2>
-    <div class="sline"></div>
+    <div class="tag">All Products</div>
+    <h2>Everything You Need to <em>Win Online</em></h2>
+    <p>9 premium digital products — each one with an affiliate commission so you can earn while sharing.</p>
+    <div class="sh-line"></div>
   </div>
-  <div class="pgrid" id="pgrid">
+  <div class="p-grid" id="pgrid">
 
-    <div class="pc reveal" data-cat="ebook" data-name="short-form affiliate blueprint tiktok pinterest passive income earn money">
-      <div class="pimg"><div class="pibg pg1"></div>
+    <div class="pc reveal" data-cat="ebook" data-name="affiliate blueprint tiktok pinterest passive income earn money commission">
+      <div class="pimg"><div class="pibg g1"></div>
         <div class="book3d"><div class="bcover" style="background:linear-gradient(145deg,#8B1a1a,#C9A84C);"><div class="bico">&#128176;</div><div class="btxt">Affiliate Blueprint</div></div></div>
         <div class="pbadge b-red">&#128293; Bestseller</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">eBook &middot; PDF</div>
         <h3 class="pname">The Short-Form Affiliate Blueprint</h3>
-        <p class="pdesc">The exact roadmap Nigerians are using to generate &#8358;50,000+ in month one using only TikTok and Pinterest &mdash; zero ad spend required.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;1,500 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="7500">&#8358;7,500</span><span class="pprice" data-ngn="5000" data-usd="4">&#8358;5,000</span></div><a href="https://payhip.com/b/CiTFO" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">The exact roadmap Nigerians are using to generate &#8358;50,000+ in month one using only TikTok and Pinterest — zero ad spend, zero experience.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;2,500 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="7500">&#8358;7,500</span><span class="pprice" data-ngn="5000" data-usd="4">&#8358;5,000</span></div>
+          <a href="https://payhip.com/b/CiTFO" class="pbtn track-buy" data-product="Affiliate Blueprint" data-price="5000">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.07s" data-cat="course" data-name="60 minute business automation stack ai workflows solopreneur automate">
-      <div class="pimg"><div class="pibg pg2"></div>
-        <div class="course3d" style="background:linear-gradient(145deg,#1a3a6b,#2d6bcd);"><div class="bico">&#129302;</div><div class="btxt">AI Automation</div></div>
+    <div class="pc reveal" style="transition-delay:.07s" data-cat="course" data-name="60 minute automation ai workflows solopreneur business automate">
+      <div class="pimg"><div class="pibg g2"></div>
+        <div class="course3d" style="background:linear-gradient(145deg,#1a3a6b,#2d6bcd);"><div class="bico">&#129302;</div><div class="btxt" style="font-family:'Cormorant Garamond',serif;font-size:.52rem;color:rgba(255,255,255,.85);">AI Automation</div></div>
         <div class="pbadge b-green">New</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">Course</div>
         <h3 class="pname">The 60-Minute Business Automation Stack</h3>
-        <p class="pdesc">How to run your entire business in 60 minutes a day using free AI tools &mdash; earn while you sleep, study, or rest.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;300 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="3000">&#8358;3,000</span><span class="pprice" data-ngn="1000" data-usd="1">&#8358;1,000</span></div><a href="https://payhip.com/b/ORkqt" class="pbtn">Enroll &rarr;</a></div>
+        <p class="pdesc">How to run your entire business in 60 minutes a day using free AI — so you earn while you sleep, study, or rest.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;500 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="3000">&#8358;3,000</span><span class="pprice" data-ngn="1000" data-usd="1">&#8358;1,000</span></div>
+          <a href="https://payhip.com/b/ORkqt" class="pbtn track-buy" data-product="AI Automation" data-price="1000">Enroll &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.14s" data-cat="ebook" data-name="quant edge automated trading systems technical indicators forex crypto">
-      <div class="pimg"><div class="pibg pg3"></div>
+    <div class="pc reveal" style="transition-delay:.14s" data-cat="ebook" data-name="quant edge trading automated systems technical indicators forex">
+      <div class="pimg"><div class="pibg g3"></div>
         <div class="book3d"><div class="bcover" style="background:linear-gradient(145deg,#0d4a2f,#1a8c5b);"><div class="bico">&#128200;</div><div class="btxt">Quant Edge Trading</div></div></div>
         <div class="pbadge b-gold">50% OFF</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">eBook &middot; PDF</div>
         <h3 class="pname">The Quant Edge: Automated Trading Systems</h3>
-        <p class="pdesc">Build a trading bot that works 24/7. Master indicators pros use and backtest before risking a single naira.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;150 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="1000">&#8358;1,000</span><span class="pprice" data-ngn="500" data-usd="1">&#8358;500</span></div><a href="https://payhip.com/b/tvD1P" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">Build a trading bot that works 24/7. Master indicators the pros use — backtest before risking a single naira.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;250 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="1000">&#8358;1,000</span><span class="pprice" data-ngn="500" data-usd="1">&#8358;500</span></div>
+          <a href="https://payhip.com/b/tvD1P" class="pbtn track-buy" data-product="Quant Edge" data-price="500">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" data-cat="course" data-name="7 day dropshipping launch blueprint first sale niche tiktok ecommerce">
-      <div class="pimg"><div class="pibg pg4"></div>
-        <div class="course3d" style="background:linear-gradient(145deg,#4a1a6b,#8b44cc);"><div class="bico">&#128715;</div><div class="btxt">Dropshipping Launch</div></div>
+    <div class="pc reveal" data-cat="course" data-name="dropshipping launch blueprint first sale niche tiktok ecommerce store">
+      <div class="pimg"><div class="pibg g4"></div>
+        <div class="course3d" style="background:linear-gradient(145deg,#4a1a6b,#8b44cc);"><div class="bico">&#128715;</div><div class="btxt" style="font-family:'Cormorant Garamond',serif;font-size:.52rem;color:rgba(255,255,255,.85);">Dropshipping</div></div>
         <div class="pbadge b-green">New</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">Course</div>
         <h3 class="pname">7-Day Dropshipping Launch Blueprint</h3>
-        <p class="pdesc">From zero to first sale in 7 days. The M.E.O. system for niche, store, and free TikTok traffic that actually converts.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;300 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="3000">&#8358;3,000</span><span class="pprice" data-ngn="1000" data-usd="1">&#8358;1,000</span></div><a href="https://payhip.com/b/6nSj0" class="pbtn">Enroll &rarr;</a></div>
+        <p class="pdesc">From zero to first sale in 7 days. The M.E.O. method for picking products, building a store, and driving free TikTok traffic.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;500 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="3000">&#8358;3,000</span><span class="pprice" data-ngn="1000" data-usd="1">&#8358;1,000</span></div>
+          <a href="https://payhip.com/b/6nSj0" class="pbtn track-buy" data-product="Dropshipping" data-price="1000">Enroll &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.07s" data-cat="template" data-name="freelancer rate card template pdf designer writer services client">
-      <div class="pimg"><div class="pibg pg5"></div>
+    <div class="pc reveal" style="transition-delay:.07s" data-cat="template" data-name="freelancer rate card template pdf services clients pricing professional">
+      <div class="pimg"><div class="pibg g5"></div>
         <div class="tmpl3d"><div class="tl"></div><div class="tl"></div><div class="tl"></div><div class="tl"></div><div class="tl"></div></div>
         <div class="pbadge b-gold">&#128293; Hot</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">PDF Template &middot; 4 Pages</div>
         <h3 class="pname">Freelancer Rate Card Template</h3>
-        <p class="pdesc">The tool that made clients stop lowballing. Send this and watch them pay your full price without negotiating.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;1,800 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="10000">&#8358;10,000</span><span class="pprice" data-ngn="6000" data-usd="4">&#8358;6,000</span></div><a href="https://payhip.com/b/F1V5w" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">The tool that made clients stop lowballing. Send this and watch them pay your full price without negotiating — guaranteed.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;3,000 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="10000">&#8358;10,000</span><span class="pprice" data-ngn="6000" data-usd="4">&#8358;6,000</span></div>
+          <a href="https://payhip.com/b/F1V5w" class="pbtn track-buy" data-product="Rate Card" data-price="6000">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.14s" data-cat="printable" data-name="monthly budget planner printable pdf savings income expenses money finance">
-      <div class="pimg"><div class="pibg pg6"></div>
+    <div class="pc reveal" style="transition-delay:.14s" data-cat="printable" data-name="monthly budget planner printable pdf savings expenses finance money">
+      <div class="pimg"><div class="pibg g6"></div>
         <div class="book3d"><div class="bcover" style="background:linear-gradient(145deg,#0a3d52,#0e7bb0);"><div class="bico">&#129534;</div><div class="btxt">Budget Planner</div></div></div>
         <div class="pbadge b-purple">Limited</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">Printable PDF &middot; 5 Pages</div>
         <h3 class="pname">Monthly Budget Planner</h3>
-        <p class="pdesc">Helped Nigerians save &#8358;50,000+ in 3 months. Track every kobo in and out and finally know where your money goes.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;2,400 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="12000">&#8358;12,000</span><span class="pprice" data-ngn="8000" data-usd="5">&#8358;8,000</span></div><a href="https://payhip.com/b/zj7xQ" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">Helped Nigerians save &#8358;50,000+ in 3 months. Track every kobo — finally know where your money goes and where it grows.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;4,000 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="12000">&#8358;12,000</span><span class="pprice" data-ngn="8000" data-usd="5">&#8358;8,000</span></div>
+          <a href="https://payhip.com/b/zj7xQ" class="pbtn track-buy" data-product="Budget Planner" data-price="8000">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" data-cat="template" data-name="business social media post kit html template brand engagement marketing">
-      <div class="pimg"><div class="pibg pg2"></div>
+    <div class="pc reveal" data-cat="template" data-name="social media post kit html template brand marketing engagement">
+      <div class="pimg"><div class="pibg g2"></div>
         <div class="tmpl3d" style="width:108px;height:84px;"><div class="tl" style="background:rgba(100,160,255,.7);"></div><div class="tl"></div><div class="tl"></div><div class="tl"></div><div class="tl"></div></div>
         <div class="pbadge b-green">New</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">Template &middot; HTML</div>
         <h3 class="pname">Business Social Media Post Kit</h3>
-        <p class="pdesc">Look like a &#8358;1M brand on social media from day one. Stop-the-scroll templates that drive real engagement.</p>
-        <div class="aff-tag">&#128279; Earn &euro;3.60 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="20000">&#8358;20,000</span><span class="pprice" data-ngn="12" data-usd="12">&euro;12.00</span></div><a href="https://payhip.com/b/IB1PC" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">Look like a &#8358;1M brand on social media from day one. Stop-the-scroll templates that drive real engagement and sales.</p>
+        <div class="paff">&#128279; Affiliates earn &euro;6 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="20000">&#8358;20,000</span><span class="pprice" data-ngn="12" data-usd="12">&euro;12.00</span></div>
+          <a href="https://payhip.com/b/IB1PC" class="pbtn track-buy" data-product="Social Kit" data-price="12">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.07s" data-cat="ebook" data-name="make money online without paypal nigeria edition paystack payoneer fiverr">
-      <div class="pimg"><div class="pibg pg1"></div>
+    <div class="pc reveal" style="transition-delay:.07s" data-cat="ebook" data-name="make money online without paypal nigeria paystack payoneer fiverr phone">
+      <div class="pimg"><div class="pibg g1"></div>
         <div class="book3d"><div class="bcover" style="background:linear-gradient(145deg,#1a4a1a,#2d8b2d);"><div class="bico">&#127757;</div><div class="btxt">Make Money Without PayPal</div></div></div>
         <div class="pbadge b-red">&#128293; Most Popular</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">eBook &middot; PDF &middot; Nigeria Edition</div>
         <h3 class="pname">Make Money Online Without PayPal</h3>
-        <p class="pdesc">Helping 1,000+ Nigerians earn online with Paystack &amp; Payoneer &mdash; no PayPal, no excuses, just results.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;150 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="1000">&#8358;1,000</span><span class="pprice" data-ngn="500" data-usd="1">&#8358;500</span></div><a href="https://payhip.com/b/Icv6d" class="pbtn">Get It &rarr;</a></div>
+        <p class="pdesc">Helping 1,000+ Nigerians earn online with Paystack &amp; Payoneer. No PayPal, no excuses — just start from your phone today.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;250 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="1000">&#8358;1,000</span><span class="pprice" data-ngn="500" data-usd="1">&#8358;500</span></div>
+          <a href="https://payhip.com/b/Icv6d" class="pbtn track-buy" data-product="No PayPal Guide" data-price="500">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <div class="pc reveal" style="transition-delay:.14s" data-cat="template" data-name="luxesell premium payhip store page template html design dark gold">
-      <div class="pimg"><div class="pibg pg3"></div>
-        <div class="tmpl3d" style="width:118px;height:88px;"><div class="tl" style="background:rgba(201,168,76,.85);height:7px;"></div><div class="tl" style="width:90%;"></div><div class="tl" style="width:72%;"></div><div class="tl" style="width:84%;"></div></div>
+    <div class="pc reveal" style="transition-delay:.14s" data-cat="template" data-name="luxesell premium payhip store page template html dark gold design">
+      <div class="pimg"><div class="pibg g3"></div>
+        <div class="tmpl3d" style="width:118px;height:88px;"><div class="tl" style="background:rgba(201,168,76,.85);height:7px;"></div><div class="tl" style="width:88%;"></div><div class="tl" style="width:70%;"></div><div class="tl" style="width:82%;"></div></div>
         <div class="pbadge b-gold">&#127942; Premium</div><div class="mini-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
       </div>
       <div class="pbody">
         <div class="pcat">Template &middot; HTML</div>
-        <h3 class="pname">LuxeSell &mdash; Premium Payhip Store Template</h3>
-        <p class="pdesc">The exact luxury dark-gold store you&#8217;re on right now &mdash; yours to own. One HTML file, no coding, live in 10 minutes.</p>
-        <div class="aff-tag">&#128279; Earn &#8358;3,900 per sale as an affiliate</div>
-        <div class="pfoot"><div><span class="porig" data-ngn="20000">&#8358;20,000</span><span class="pprice" data-ngn="13000" data-usd="9">&#8358;13,000</span></div><a href="https://payhip.com/b/9y0PQ" class="pbtn">Get It &rarr;</a></div>
+        <h3 class="pname">LuxeSell — Premium Payhip Store Template</h3>
+        <p class="pdesc">The exact luxury dark-gold store you&#8217;re on right now — yours to own. One HTML file. No coding. Live in 10 minutes.</p>
+        <div class="paff">&#128279; Affiliates earn &#8358;6,500 per sale</div>
+        <div class="pfoot"><div><span class="porig" data-ngn="20000">&#8358;20,000</span><span class="pprice" data-ngn="13000" data-usd="9">&#8358;13,000</span></div>
+          <a href="https://payhip.com/b/9y0PQ" class="pbtn track-buy" data-product="LuxeSell Template" data-price="13000">Get It &rarr;</a>
+        </div>
       </div>
     </div>
 
-    <p class="no-res" id="noRes">No products found &mdash; try a different keyword &#128269;</p>
+    <p class="no-res" id="noRes">No products found — try a different keyword &#128269;</p>
   </div>
 </section>
 
-<!-- ══════════ AFFILIATE SECTION ══════════ -->
+<!-- AFFILIATE SECTION -->
 <section class="aff-section" id="affiliate">
-  <div class="aff-grid">
-    <div class="aff-info">
-      <div class="sh" style="text-align:left;margin-bottom:24px;">
-        <div class="stag">Affiliate Program</div>
-        <h2 class="stitle">Earn <em>30% Commission</em><br>on Every Sale</h2>
-        <div class="sline" style="margin-left:0;"></div>
+  <div class="sh reveal">
+    <div class="tag">Earn With NeyoDigitals</div>
+    <h2>Promote Digital Products &amp;<br><em>Earn Up to 50% Commission</em></h2>
+    <p>Promote digital products and earn online from anywhere in Nigeria. No experience needed. No PayPal required. Start with just your phone.</p>
+    <div class="sh-line"></div>
+  </div>
+  <div class="aff-hero reveal">
+    <div class="aff-inner">
+      <div>
+        <div class="aff-rate-big"><sup>%</sup>50</div>
+        <div class="aff-rate-label">Commission Per Sale — Nigeria&#8217;s Highest</div>
+        <div class="aff-bullets">
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#128176;</span><span>Earn up to <strong>50% commission</strong> on every sale you refer</span></div>
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#128279;</span><span>Get your <strong>own referral link</strong> instantly after signing up</span></div>
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#128241;</span><span><strong>Beginner friendly</strong> — start with just your phone</span></div>
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#127475;&#127468;</span><span><strong>No PayPal required</strong> — withdraw via Paystack or Payoneer</span></div>
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#9200;</span><span>Earn commissions <strong>24/7</strong> — even while you sleep</span></div>
+          <div class="aff-bullet"><span class="aff-bullet-icon">&#128184;</span><span>Commissions paid <strong>directly to your wallet</strong> in real time</span></div>
+        </div>
+        <button class="btn btn-gold btn-lg" id="start-earning-btn" onclick="openOverlay('signupModal');trackAff()">Start Earning Now &rarr;</button>
       </div>
-      <div class="aff-steps">
-        <div class="aff-step"><div class="aff-num">1</div><div class="aff-step-text"><h4>Create a free account</h4><p>Sign up in 30 seconds. No payment required.</p></div></div>
-        <div class="aff-step"><div class="aff-num">2</div><div class="aff-step-text"><h4>Get your unique referral link</h4><p>Share it on WhatsApp, TikTok, Instagram, or anywhere.</p></div></div>
-        <div class="aff-step"><div class="aff-num">3</div><div class="aff-step-text"><h4>Earn 30% on every sale</h4><p>Commissions go straight to your NeyoDigitals wallet.</p></div></div>
-        <div class="aff-step"><div class="aff-num">4</div><div class="aff-step-text"><h4>Withdraw via Paystack</h4><p>Minimum &#8358;5,000. No PayPal needed. Nigerian-friendly.</p></div></div>
-      </div>
-      <button class="btn-gold" onclick="openModal('signupModal')">Join Affiliate Program Free &rarr;</button>
-    </div>
-    <div class="aff-card reveal">
-      <div class="aff-rate">30<span>%</span></div>
-      <div class="aff-rate-label">Commission Per Sale</div>
-      <div class="aff-perks">
-        <div class="aff-perk">Earn on all 9 products instantly</div>
-        <div class="aff-perk">Real-time earnings dashboard</div>
-        <div class="aff-perk">No minimum to start earning</div>
-        <div class="aff-perk">Withdraw to Paystack / Payoneer</div>
-        <div class="aff-perk">Referral bonuses on sign-ups too</div>
-        <div class="aff-perk">Free marketing materials provided</div>
-      </div>
-      <div style="font-size:.8rem;color:var(--cream);margin-bottom:12px;font-weight:600;">Your referral link preview:</div>
-      <div class="aff-link-box">
-        <span class="aff-link-text">payhip.com/NeyoDigital?ref=YOURCODE</span>
-        <button class="copy-btn" onclick="openModal('signupModal')">Get Link</button>
+      <div class="aff-right">
+        <div class="aff-steps-title">How it works in 4 simple steps:</div>
+        <div class="aff-steps">
+          <div class="aff-step"><div class="step-num active">1</div><div class="step-info"><h4>Sign up for free</h4><p>Create your NeyoDigitals account in 30 seconds — no payment needed.</p></div></div>
+          <div class="aff-step"><div class="step-num">2</div><div class="step-info"><h4>Get your unique referral link</h4><p>Your personal link is ready instantly inside your dashboard.</p></div></div>
+          <div class="aff-step"><div class="step-num">3</div><div class="step-info"><h4>Share on WhatsApp, TikTok, Facebook</h4><p>Post your link anywhere people might buy. No following needed.</p></div></div>
+          <div class="aff-step"><div class="step-num">4</div><div class="step-info"><h4>Earn money on every sale</h4><p>50% commission lands in your wallet instantly. Withdraw anytime.</p></div></div>
+        </div>
+        <div class="aff-link-preview">
+          <span class="aff-link-url">payhip.com/NeyoDigital?ref=YOURCODE</span>
+          <button class="copy-btn" onclick="openOverlay('signupModal')">Get My Link</button>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══════════ WHY US ══════════ -->
-<section class="why" id="why">
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
   <div class="sh reveal">
-    <div class="stag">Why NeyoDigitals</div>
-    <h2 class="stitle">Built on <em>Facts</em>, Not Promises</h2>
-    <div class="sline"></div>
+    <div class="tag">How It Works</div>
+    <h2>From Zero to <em>Earning Online</em> in 4 Steps</h2>
+    <p>No experience. No capital. No PayPal. Just your phone and this simple system.</p>
+    <div class="sh-line"></div>
+  </div>
+  <div class="how-grid">
+    <div class="how-card reveal" style="transition-delay:.04s">
+      <div class="how-icon-wrap">&#128241;</div>
+      <div class="how-step">Step 01</div>
+      <div class="how-title">Sign Up Free</div>
+      <p class="how-desc">Create your account in 30 seconds. Get your personal wallet and referral link instantly.</p>
+      <div class="how-arrow">&#8594;</div>
+    </div>
+    <div class="how-card reveal" style="transition-delay:.1s">
+      <div class="how-icon-wrap">&#128279;</div>
+      <div class="how-step">Step 02</div>
+      <div class="how-title">Get Your Link</div>
+      <p class="how-desc">Your unique referral link is ready immediately in your dashboard. Copy it in one click.</p>
+      <div class="how-arrow">&#8594;</div>
+    </div>
+    <div class="how-card reveal" style="transition-delay:.16s">
+      <div class="how-icon-wrap">&#128172;</div>
+      <div class="how-step">Step 03</div>
+      <div class="how-title">Share Anywhere</div>
+      <p class="how-desc">Post on WhatsApp, TikTok, Facebook, or Instagram. Every view is a potential commission.</p>
+      <div class="how-arrow">&#8594;</div>
+    </div>
+    <div class="how-card reveal" style="transition-delay:.22s">
+      <div class="how-icon-wrap">&#128176;</div>
+      <div class="how-step">Step 04</div>
+      <div class="how-title">Get Paid</div>
+      <p class="how-desc">50% commission lands in your wallet instantly. Withdraw to Paystack or Payoneer anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="why-section" id="why">
+  <div class="sh reveal">
+    <div class="tag">Why NeyoDigitals</div>
+    <h2>Built on <em>Facts</em>, Not Promises</h2>
+    <div class="sh-line"></div>
   </div>
   <div class="why-grid">
-    <div class="wi reveal"><div class="wi-ico">&#9889;</div><h3 class="wi-title">Instant Access</h3><p class="wi-desc">Download immediately after payment. No waiting — start applying your new knowledge in minutes.</p><div class="wi-stat">100% of orders delivered in under 60 seconds</div></div>
-    <div class="wi reveal" style="transition-delay:.07s"><div class="wi-ico">&#127475;&#127468;</div><h3 class="wi-title">Made for Nigeria</h3><p class="wi-desc">Built around Paystack, Payoneer, and platforms that actually work here. No PayPal ever required.</p><div class="wi-stat">Used by students across 12+ Nigerian states</div></div>
-    <div class="wi reveal" style="transition-delay:.14s"><div class="wi-ico">&#128176;</div><h3 class="wi-title">Earn Commissions</h3><p class="wi-desc">Our affiliate program pays 30% per sale. Share your link once and earn forever with zero extra work.</p><div class="wi-stat">Top affiliates earning &#8358;30,000+/month</div></div>
-    <div class="wi reveal" style="transition-delay:.21s"><div class="wi-ico">&#128172;</div><h3 class="wi-title">24/7 Support</h3><p class="wi-desc">Stuck? Message us on WhatsApp any time. Real support from real people who want you to succeed.</p><div class="wi-stat">Average response time: under 2 hours</div></div>
+    <div class="wi reveal"><div class="wi-ico">&#9889;</div><h3 class="wi-t">Instant Access</h3><p class="wi-d">Download immediately after payment. Start applying your knowledge within minutes of buying.</p><div class="wi-s">100% of orders delivered in under 60 seconds</div></div>
+    <div class="wi reveal" style="transition-delay:.07s"><div class="wi-ico">&#127475;&#127468;</div><h3 class="wi-t">Made for Nigeria</h3><p class="wi-d">Built around Paystack, Payoneer, and platforms that actually work here. No PayPal, ever.</p><div class="wi-s">Used by students in 12+ Nigerian states</div></div>
+    <div class="wi reveal" style="transition-delay:.14s"><div class="wi-ico">&#128176;</div><h3 class="wi-t">50% Commissions</h3><p class="wi-d">Nigeria's highest affiliate rate. Share once, earn forever with zero additional work required.</p><div class="wi-s">Top affiliates earning &#8358;50,000+/month</div></div>
+    <div class="wi reveal" style="transition-delay:.21s"><div class="wi-ico">&#128172;</div><h3 class="wi-t">24/7 Support</h3><p class="wi-d">Real support from real people who want you to succeed. WhatsApp us anytime — day or night.</p><div class="wi-s">Average response time under 2 hours</div></div>
   </div>
 </section>
 
-<!-- ══════════ TESTIMONIALS ══════════ -->
-<section class="testi" id="reviews">
+<!-- TESTIMONIALS -->
+<section class="testi-section" id="reviews">
   <div class="sh reveal">
-    <div class="stag">Verified Reviews</div>
-    <h2 class="stitle">Real People. <em>Real Results.</em></h2>
-    <div class="sline"></div>
+    <div class="tag">Verified Reviews</div>
+    <h2>Real People. <em>Real Results.</em></h2>
+    <div class="sh-line"></div>
   </div>
   <div class="tgrid">
-    <div class="tc reveal"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">The Affiliate Blueprint is no joke. I followed the exact TikTok steps and made my first &#8358;18,000 commission in 11 days. This is not theory &mdash; it actually works.</p><div class="tauthor"><div class="tav">CE</div><div><div class="tname">Chisom E.</div><div class="trole">Affiliate Marketer, Enugu</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
-    <div class="tc reveal" style="transition-delay:.09s"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">I sent the Freelancer Rate Card to my first client and they didn&#8217;t even try to negotiate. Paid my full &#8358;45,000 without blinking. Worth every kobo.</p><div class="tauthor"><div class="tav">TO</div><div><div class="tname">Tunde O.</div><div class="trole">Graphic Designer, Lagos</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
-    <div class="tc reveal" style="transition-delay:.18s"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">Set up Payoneer and listed my first Fiverr gig in one afternoon using the guide. Got my first order within the week. Built for us Nigerians for real.</p><div class="tauthor"><div class="tav">AM</div><div><div class="tname">Adaeze M.</div><div class="trole">Freelancer, Abuja</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
+    <div class="tcard reveal"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">The Affiliate Blueprint changed everything. I followed the TikTok steps and made my first &#8358;18,000 commission in 11 days. This is not theory — it actually works.</p><div class="tauthor"><div class="tav">CE</div><div><div class="tname">Chisom E.</div><div class="trole">Affiliate Marketer, Enugu</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
+    <div class="tcard reveal" style="transition-delay:.09s"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">I sent the Rate Card to my first client. They paid &#8358;45,000 without negotiating once. This template paid for itself 7x over in the first week.</p><div class="tauthor"><div class="tav">TO</div><div><div class="tname">Tunde O.</div><div class="trole">Graphic Designer, Lagos</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
+    <div class="tcard reveal" style="transition-delay:.18s"><div class="tq">"</div><div class="tstars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><p class="ttext">Set up Payoneer and listed my first Fiverr gig in one afternoon using the PayPal guide. Got my first order 5 days later. Built for Nigerians for real.</p><div class="tauthor"><div class="tav">AM</div><div><div class="tname">Adaeze M.</div><div class="trole">Freelancer, Abuja</div><div class="tver">&#10003; Verified Buyer</div></div></div></div>
   </div>
 </section>
 
-<!-- ══════════ FAQ ══════════ -->
-<section class="faq" id="faq">
+<!-- FAQ -->
+<section class="faq-section" id="contact">
   <div class="sh reveal">
-    <div class="stag">FAQ</div>
-    <h2 class="stitle">Got <em>Questions?</em> We&#8217;ve Got Answers</h2>
-    <div class="sline"></div>
+    <div class="tag">FAQ</div>
+    <h2>Got <em>Questions?</em></h2>
+    <div class="sh-line"></div>
   </div>
   <div class="flist reveal">
-    <div class="fi"><button class="fq">How do I receive my product after buying? <span class="fq-ico">+</span></button><div class="fa"><p>Immediately after payment Payhip sends a download link to your email. You can also access it anytime from your Payhip account dashboard. Instant, no waiting.</p></div></div>
-    <div class="fi"><button class="fq">Do I need PayPal to buy? <span class="fq-ico">+</span></button><div class="fa"><p>No. Pay with your debit card, Paystack, or other local methods. No PayPal required at all — that's the whole point!</p></div></div>
-    <div class="fi"><button class="fq">How does the affiliate program work? <span class="fq-ico">+</span></button><div class="fa"><p>Create a free account, get your unique referral link, share it anywhere, and earn 30% commission on every sale made through your link. Commissions go to your NeyoDigitals wallet and you can withdraw via Paystack once you reach ₦5,000.</p></div></div>
-    <div class="fi"><button class="fq">What is the NeyoDigitals wallet? <span class="fq-ico">+</span></button><div class="fa"><p>Your wallet tracks all affiliate commissions and referral bonuses you earn. You can withdraw to your Paystack or Payoneer account once you reach the ₦5,000 minimum. Sign up free to activate your wallet.</p></div></div>
-    <div class="fi"><button class="fq">How does the free CV builder work? <span class="fq-ico">+</span></button><div class="fa"><p>Sign in and go to your Dashboard, then click the CV Builder tab. Fill in your details, see a live preview update in real time, then click Download to print or save your professional CV as a PDF.</p></div></div>
-    <div class="fi"><button class="fq">Are the products beginner-friendly? <span class="fq-ico">+</span></button><div class="fa"><p>Absolutely. Every product is designed for clarity and action, even if you're starting from zero. No technical experience required.</p></div></div>
-    <div class="fi"><button class="fq">How do I apply the discount code NEYO20? <span class="fq-ico">+</span></button><div class="fa"><p>Click any "Get It" button to go to the Payhip product page, then enter <strong>NEYO20</strong> at checkout for 20% off. Simple!</p></div></div>
+    <div class="fi"><button class="fq">How do I receive my product after buying? <span class="fq-ico">+</span></button><div class="fa"><p>Immediately after payment Payhip sends a download link to your email. You can also access it from your Payhip account anytime. Instant, no delays.</p></div></div>
+    <div class="fi"><button class="fq">Do I need PayPal to buy? <span class="fq-ico">+</span></button><div class="fa"><p>No. Pay with your debit card or Paystack. No PayPal required — ever. That's the whole point!</p></div></div>
+    <div class="fi"><button class="fq">How does the affiliate program work? <span class="fq-ico">+</span></button><div class="fa"><p>Create a free account, get your unique referral link, share it anywhere, and earn 50% commission on every sale made through your link. Commissions land in your wallet instantly and you can withdraw via Paystack once you reach ₦5,000.</p></div></div>
+    <div class="fi"><button class="fq">What is Firebase Analytics tracking? <span class="fq-ico">+</span></button><div class="fa"><p>Firebase Analytics tracks anonymous page views, affiliate button clicks, product clicks, and scroll depth. This helps us understand which products perform best and improve the platform. No personal data is stored without consent.</p></div></div>
+    <div class="fi"><button class="fq">How does the free CV builder work? <span class="fq-ico">+</span></button><div class="fa"><p>Sign in, open your Dashboard, and click the CV Builder tab. Fill in your details, see a live preview, then click Download/Print to save your professional CV as a PDF. Completely free for all users.</p></div></div>
+    <div class="fi"><button class="fq">How do I apply the discount code NEYO20? <span class="fq-ico">+</span></button><div class="fa"><p>Click any "Get It" button, go to the Payhip product page, and enter <strong>NEYO20</strong> at checkout for 20% off.</p></div></div>
   </div>
 </section>
 
-<!-- ══════════ NEWSLETTER ══════════ -->
-<section class="nl">
+<!-- NEWSLETTER -->
+<section class="nl-section">
   <div class="nl-bg"></div>
   <div class="nl-wrap reveal">
-    <div class="stag">Free Resource</div>
+    <div class="label">Free Resource</div>
     <h2>Get My <em>Free Freelancer Guide</em></h2>
-    <p>Join 1,000+ Nigerians already earning online. Drop your email and get the free starter guide instantly.</p>
+    <p>Join 1,000+ Nigerians already earning online. Drop your email and get the free guide instantly.</p>
     <div class="nl-form" id="nlForm">
       <input class="nl-inp" type="email" id="nlEmail" placeholder="Your email address...">
       <button class="nl-btn" onclick="subNL()">Get Free Guide</button>
@@ -929,26 +1091,26 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px
   </div>
 </section>
 
-<!-- ══════════ CTA ══════════ -->
-<section class="cta">
+<!-- CTA -->
+<section class="cta-section">
   <div class="cta-bg"></div>
   <div class="cta-wrap reveal">
-    <div class="stag">Ready to Start?</div>
+    <div class="label">Ready to Start?</div>
     <div class="cta-div"></div>
-    <h2 class="cta-title">Stop Waiting.<br><em>Start Earning Today.</em></h2>
-    <p class="cta-sub">9 products. Affiliate program. Free wallet. Free CV builder. All starting from &#8358;500. Use <strong>NEYO20</strong> for 20% off.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a href="https://payhip.com/NeyoDigital" class="btn-gold">Visit Full Store &rarr;</a>
-      <button class="btn-outline" onclick="openModal('signupModal')">Create Free Account</button>
+    <h2 class="cta-title">Stop Scrolling and<br><em>Start Earning Today.</em></h2>
+    <p class="cta-sub">9 premium products. 50% affiliate program. Free wallet. Free CV builder. Starting from &#8358;500. Use <strong>NEYO20</strong> for 20% off.</p>
+    <div class="cta-btns">
+      <a href="https://payhip.com/NeyoDigital" class="btn btn-gold btn-lg">Visit Full Store &rarr;</a>
+      <button class="btn btn-outline btn-lg" onclick="openOverlay('signupModal')">Create Free Account</button>
     </div>
   </div>
 </section>
 
-<!-- ══════════ FOOTER ══════════ -->
+<!-- FOOTER -->
 <footer>
   <div class="fbrand">
-    <a href="#" class="nav-logo" style="font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:600;color:var(--gold);">Neyo<span style="color:var(--cream);font-weight:300;font-style:italic;">Digitals</span></a>
-    <p>Nigeria&#8217;s trusted digital products platform. Buy, earn, and grow &mdash; all in one place.</p>
+    <div class="logo" style="font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:600;color:var(--gold);">Neyo<span style="color:var(--cream);font-weight:300;font-style:italic;">Digitals</span></div>
+    <p>Nigeria&#8217;s trusted digital products platform. Buy, earn, and grow — all in one place. No PayPal needed.</p>
     <div class="socials">
       <a href="#" class="soc" title="TikTok">&#127925;</a>
       <a href="https://wa.me/2349072212496" class="soc" title="WhatsApp">&#128172;</a>
@@ -965,17 +1127,17 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px
       <li><a href="https://payhip.com/b/6nSj0">Dropshipping</a></li>
       <li><a href="https://payhip.com/b/tvD1P">Quant Edge</a></li>
       <li><a href="https://payhip.com/b/F1V5w">Rate Card</a></li>
-      <li><a href="https://payhip.com/NeyoDigital" style="color:var(--gold);font-weight:600;">View All &rarr;</a></li>
+      <li><a href="https://payhip.com/NeyoDigital" style="color:var(--gold);font-weight:600;">All Products &rarr;</a></li>
     </ul>
   </div>
   <div class="fcol">
     <h4>Platform</h4>
     <ul>
-      <li><a href="#" onclick="openModal('signupModal')">Create Account</a></li>
-      <li><a href="#" onclick="openModal('signinModal')">Sign In</a></li>
+      <li><a href="#" onclick="openOverlay('signupModal')">Create Account</a></li>
+      <li><a href="#" onclick="openOverlay('loginModal')">Sign In</a></li>
       <li><a href="#affiliate">Affiliate Program</a></li>
-      <li><a href="#" onclick="openModal('signupModal')">My Wallet</a></li>
-      <li><a href="#" onclick="openAffiliate()">CV Builder</a></li>
+      <li><a href="#" onclick="openOverlay('signupModal')">My Wallet</a></li>
+      <li><a href="#" onclick="openOverlay('signupModal')">CV Builder</a></li>
     </ul>
   </div>
   <div class="fcol">
@@ -991,43 +1153,38 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:56px 60px
     <h4>Support</h4>
     <ul>
       <li><a href="https://wa.me/2349072212496">WhatsApp Us</a></li>
-      <li><a href="https://payhip.com/NeyoDigital/contact">Email Support</a></li>
-      <li><a href="#faq">FAQ</a></li>
+      <li><a href="https://payhip.com/NeyoDigital/contact">Email Us</a></li>
+      <li><a href="#contact">FAQ</a></li>
       <li><a href="https://payhip.com/NeyoDigital">Refund Policy</a></li>
       <li><a href="https://payhip.com/NeyoDigital">Privacy Policy</a></li>
     </ul>
   </div>
 </footer>
 <div class="fbot">
-  <span>&copy; 2026 NeyoDigitals &mdash; The Digital Blueprint. All rights reserved.</span>
-  <span>
-    <a href="#">Privacy Policy</a> &nbsp;&middot;&nbsp;
-    <a href="#">Terms of Service</a> &nbsp;&middot;&nbsp;
-    <a href="#">Affiliate Disclosure</a> &nbsp;&middot;&nbsp;
-    Powered by <a href="https://payhip.com">Payhip</a>
-  </span>
+  <span>&copy; 2026 NeyoDigitals. All rights reserved. Analytics powered by Firebase.</span>
+  <span><a href="#">Privacy Policy</a> &middot; <a href="#">Terms of Service</a> &middot; <a href="#">Affiliate Disclosure</a> &middot; Hosted on <a href="https://pages.github.com">GitHub Pages</a></span>
 </div>
 
-<!-- ══════════ FLOATERS ══════════ -->
-<a href="https://wa.me/2349072212496?text=Hi%20NeyoDigitals%2C%20I%20want%20to%20know%20more%20about%20your%20products!" class="wa-float" target="_blank">
+<!-- Floaters -->
+<a href="https://wa.me/2349072212496?text=Hi%20NeyoDigitals%21%20I%20want%20to%20know%20more%20about%20your%20products." class="wa-btn" target="_blank">
   <span class="wa-tip">Chat on WhatsApp &#128075;</span>
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
-<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+<button class="btt-btn" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
 
 <script>
-// ── Scroll reveal
-const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.08});
+/* ── Reveal ── */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.07});
 document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
 
-// ── Back to top
-const btt=document.getElementById('btt');
-window.addEventListener('scroll',()=>btt.classList.toggle('show',scrollY>500));
+/* ── Back to top ── */
+const bttBtn=document.getElementById('bttBtn');
+window.addEventListener('scroll',()=>bttBtn.classList.toggle('show',scrollY>500));
 
-// ── Countdown
+/* ── Countdown ── */
 (function(){
-  let e;try{const s=localStorage.getItem('nd3_end');if(s)e=new Date(s);}catch(_){}
-  if(!e||e<=new Date()){e=new Date(Date.now()+23*36e5+59*6e4+59e3);try{localStorage.setItem('nd3_end',e.toISOString());}catch(_){}}
+  let e;try{const s=localStorage.getItem('nd4_end');if(s)e=new Date(s);}catch(_){}
+  if(!e||e<=new Date()){e=new Date(Date.now()+23*36e5+59*6e4+59e3);try{localStorage.setItem('nd4_end',e.toISOString());}catch(_){}}
   setInterval(()=>{
     const d=e-new Date();if(d<=0)return;
     document.getElementById('t-h').textContent=String(Math.floor(d/36e5)).padStart(2,'0');
@@ -1036,33 +1193,37 @@ window.addEventListener('scroll',()=>btt.classList.toggle('show',scrollY>500));
   },1000);
 })();
 
-// ── Newsletter popup
-setTimeout(()=>{try{if(!localStorage.getItem('nd_pop'))document.getElementById('popup').classList.add('open');}catch(_){document.getElementById('popup').classList.add('open');}},9000);
-function closePopup(){document.getElementById('popup').classList.remove('open');try{localStorage.setItem('nd_pop','1');}catch(_){}}
+/* ── Firebase helper ── */
+function trackAff(){try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'affiliate_click',{source:'cta_button',time:new Date().toISOString()});}catch(_){}}
+
+/* ── Popup ── */
+setTimeout(()=>{try{if(!localStorage.getItem('nd4_pop'))document.getElementById('popup').classList.add('open');}catch(_){document.getElementById('popup').classList.add('open');}},10000);
 function submitPopup(){
   const v=document.getElementById('popupEmail').value;
   if(!v||!v.includes('@')){alert('Please enter a valid email.');return;}
-  document.getElementById('popupFormWrap').style.display='none';
+  document.getElementById('popupForm').style.display='none';
   document.getElementById('popupOk').style.display='block';
-  try{localStorage.setItem('nd_pop','1');}catch(_){}
+  try{localStorage.setItem('nd4_pop','1');}catch(_){}
+  try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'newsletter_signup',{source:'popup'});}catch(_){}
 }
 
-// ── Modal helpers
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function switchModal(close,open){closeModal(close);openModal(open);}
-document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+/* ── Overlay system ── */
+function openOverlay(id){document.getElementById(id).classList.add('open');}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+function switchOverlay(a,b){closeOverlay(a);openOverlay(b);}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
-// ── Auth
+/* ── Auth ── */
 let user=null;
-try{const s=localStorage.getItem('nd_user');if(s)user=JSON.parse(s);}catch(_){}
+try{const s=localStorage.getItem('nd4_user');if(s)user=JSON.parse(s);}catch(_){}
 function renderAuth(){
-  const g=document.getElementById('guestBtns'),u=document.getElementById('userBtns');
+  const g=document.getElementById('guestNav'),u=document.getElementById('userNav');
   if(user){
     g.style.display='none';u.classList.add('show');
-    document.getElementById('userAv').textContent=(user.name||'U')[0].toUpperCase();
-    document.getElementById('userName').textContent=user.name||'User';
-    document.getElementById('dashTitle').innerHTML='Welcome, <em>'+((user.name||'User').split(' ')[0])+'</em>';
+    document.getElementById('uAv').textContent=(user.name||'U')[0].toUpperCase();
+    document.getElementById('uName').textContent=(user.name||'User').split(' ')[0];
+    document.getElementById('dashGreet').innerHTML='Welcome, <em>'+((user.name||'User').split(' ')[0])+'</em>';
+    if(user.name)document.getElementById('refUrl').textContent='https://payhip.com/NeyoDigital?ref='+user.name.replace(/\s/g,'').toUpperCase().slice(0,8);
   } else {
     g.style.display='flex';u.classList.remove('show');
   }
@@ -1071,32 +1232,37 @@ renderAuth();
 function doLogin(){
   const e=document.getElementById('loginEmail').value,p=document.getElementById('loginPass').value;
   if(!e||!p){alert('Please fill in all fields.');return;}
-  user={name:e.split('@')[0].replace(/[^a-zA-Z ]/g,' '),email:e};
-  try{localStorage.setItem('nd_user',JSON.stringify(user));}catch(_){}
-  renderAuth();closeModal('signinModal');openModal('dashModal');
+  user={name:e.split('@')[0],email:e};
+  try{localStorage.setItem('nd4_user',JSON.stringify(user));}catch(_){}
+  renderAuth();closeOverlay('loginModal');openOverlay('dashModal');
+  try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'login',{method:'email'});}catch(_){}
 }
 function doRegister(){
   const n=document.getElementById('regName').value,e=document.getElementById('regEmail').value,p=document.getElementById('regPass').value;
-  if(!n||!e||!p){alert('Please fill in all fields.');return;}
+  if(!n||!e||!p){alert('Please fill all fields.');return;}
   if(p.length<8){alert('Password must be at least 8 characters.');return;}
   user={name:n,email:e};
-  try{localStorage.setItem('nd_user',JSON.stringify(user));}catch(_){}
-  renderAuth();closeModal('signupModal');openModal('dashModal');
-  document.getElementById('refUrl').textContent='https://payhip.com/NeyoDigital?ref='+n.replace(/\s/g,'').toUpperCase().slice(0,8);
+  try{localStorage.setItem('nd4_user',JSON.stringify(user));}catch(_){}
+  renderAuth();closeOverlay('signupModal');openOverlay('dashModal');
+  try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'sign_up',{method:'email'});}catch(_){}
 }
-function doLogout(){user=null;try{localStorage.removeItem('nd_user');}catch(_){}renderAuth();closeModal('dashModal');}
-function socialLogin(p){alert('Connecting with '+p+'...\n\n(In production this would open OAuth flow)');user={name:'Demo User',email:'demo@email.com'};try{localStorage.setItem('nd_user',JSON.stringify(user));}catch(_){}renderAuth();closeModal('signinModal');closeModal('signupModal');openModal('dashModal');}
-function saveProfile(){alert('Profile saved! ✓');}
+function doLogout(){user=null;try{localStorage.removeItem('nd4_user');}catch(_){}renderAuth();closeOverlay('dashModal');}
+function socialAuth(p){
+  user={name:'Demo User',email:'demo@neyodigitals.com'};
+  try{localStorage.setItem('nd4_user',JSON.stringify(user));}catch(_){}
+  renderAuth();closeOverlay('loginModal');closeOverlay('signupModal');openOverlay('dashModal');
+  try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'login',{method:p});}catch(_){}
+}
 
-// ── Dashboard tabs
-function switchTab(id){
+/* ── Dashboard tabs ── */
+function switchTab(id,btn){
   document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.dpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
-  event.target.classList.add('active');
+  if(btn)btn.classList.add('active');
 }
 
-// ── CV Builder
+/* ── CV Builder ── */
 function updateCV(){
   const g=(id,fb)=>document.getElementById(id)?.value||fb||'';
   document.getElementById('pvName').textContent=g('cv-name','Your Name');
@@ -1104,51 +1270,46 @@ function updateCV(){
   document.getElementById('pvEmail').textContent=g('cv-email','email@example.com');
   document.getElementById('pvPhone').textContent=g('cv-phone','Your Phone');
   document.getElementById('pvLoc').textContent=g('cv-loc','Your Location');
-  document.getElementById('pvSummary').textContent=g('cv-summary','Your professional summary...');
-  document.getElementById('pvSkills').textContent=g('cv-skills','Your skills here...');
-  document.getElementById('pvExp').textContent=g('cv-exp','Your experience here...');
-  document.getElementById('pvEdu').textContent=g('cv-edu','Your education here...');
+  document.getElementById('pvSum').textContent=g('cv-sum','Your professional summary...');
+  document.getElementById('pvSkills').textContent=g('cv-skills','Your skills...');
+  document.getElementById('pvExp').textContent=g('cv-exp','Your experience...');
+  document.getElementById('pvEdu').textContent=g('cv-edu','Your education...');
 }
 function printCV(){
-  const c=document.getElementById('cvPreview').innerHTML;
+  const c=document.getElementById('cvPaper').innerHTML;
   const w=window.open('','_blank');
-  w.document.write('<html><head><title>CV - NeyoDigitals CV Builder</title><style>body{font-family:sans-serif;padding:30px;color:#111;max-width:700px;margin:auto;}h1{font-size:1.5rem;margin-bottom:2px;}@media print{body{padding:0;}}</style></head><body>'+c+'</body></html>');
-  w.document.close();w.print();
+  w.document.write('<html><head><title>CV — NeyoDigitals CV Builder</title><style>body{font-family:sans-serif;padding:28px;color:#111;max-width:680px;margin:auto;}h1{font-size:1.45rem;margin-bottom:3px;}@media print{body{padding:0;}}</style></head><body>'+c+'</body></html>');
+  w.document.close();setTimeout(()=>w.print(),400);
 }
-function resetCV(){document.querySelectorAll('#panel-cv .form-input').forEach(i=>i.value='');updateCV();}
+function resetCV(){document.querySelectorAll('#panel-cv .input').forEach(i=>i.value='');updateCV();}
 
-// ── Affiliate helpers
+/* ── Affiliate helpers ── */
 function copyRef(){
   const t=document.getElementById('refUrl')?.textContent||'https://payhip.com/NeyoDigital?ref=USER123';
-  navigator.clipboard?.writeText(t).then(()=>alert('Referral link copied! ✓')).catch(()=>alert('Link: '+t));
+  navigator.clipboard?.writeText(t).then(()=>alert('✓ Referral link copied!')).catch(()=>alert('Your link: '+t));
 }
-function shareWA(){const t=encodeURIComponent('Hey! Check out NeyoDigitals — premium digital products for Nigerians. Use my link and we both benefit! https://payhip.com/NeyoDigital?ref=USER123');window.open('https://wa.me/?text='+t,'_blank');}
-function openAffiliate(){if(user){openModal('dashModal');setTimeout(()=>switchTab('affiliate'),100);}else{openModal('signupModal');}}
+function shareWA(){
+  const t=encodeURIComponent('🔥 Hey! Check out NeyoDigitals — premium digital products for Nigerians. Use my link and we both benefit! 👇\nhttps://payhip.com/NeyoDigital?ref='+(user?.name||'USER123').replace(/\s/g,'').toUpperCase().slice(0,8));
+  window.open('https://wa.me/?text='+t,'_blank');
+}
 
-// ── FAQ
-document.querySelectorAll('.fq').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const fi=b.parentElement,open=fi.classList.contains('open');
-    document.querySelectorAll('.fi').forEach(i=>i.classList.remove('open'));
-    if(!open)fi.classList.add('open');
-  });
-});
-
-// ── Search
+/* ── Search ── */
 document.getElementById('sinput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
 function doSearch(){applyQ(document.getElementById('sinput').value.toLowerCase().trim());}
 function applyQ(q){
-  let n=0;document.querySelectorAll('.pc').forEach(c=>{const ok=!q||c.dataset.name.includes(q);c.classList.toggle('hidden',!ok);if(ok)n++;});
+  let n=0;
+  document.querySelectorAll('.pc').forEach(c=>{const ok=!q||c.dataset.name.includes(q);c.classList.toggle('hidden',!ok);if(ok)n++;});
   document.getElementById('noRes').style.display=n===0?'block':'none';
 }
 function filterP(cat,btn){
   document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
   document.getElementById('sinput').value='';
-  let n=0;document.querySelectorAll('.pc').forEach(c=>{const ok=cat==='all'||c.dataset.cat===cat;c.classList.toggle('hidden',!ok);if(ok)n++;});
+  let n=0;
+  document.querySelectorAll('.pc').forEach(c=>{const ok=cat==='all'||c.dataset.cat===cat;c.classList.toggle('hidden',!ok);if(ok)n++;});
   document.getElementById('noRes').style.display=n===0?'block':'none';
 }
 
-// ── Currency
+/* ── Currency ── */
 let curr='ngn';
 function toggleCurrency(){
   curr=curr==='ngn'?'usd':'ngn';
@@ -1164,21 +1325,31 @@ function toggleCurrency(){
   });
 }
 
-// ── Theme
+/* ── Theme ── */
 function toggleTheme(){
   const html=document.documentElement,dark=html.getAttribute('data-theme')==='dark';
   html.setAttribute('data-theme',dark?'light':'dark');
   document.getElementById('themeBtn').textContent=dark?'☀️':'🌙';
-  try{localStorage.setItem('nd_theme',dark?'light':'dark');}catch(_){}
+  try{localStorage.setItem('nd4_theme',dark?'light':'dark');}catch(_){}
 }
-(function(){try{const t=localStorage.getItem('nd_theme');if(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('themeBtn').textContent=t==='light'?'☀️':'🌙';}}catch(_){}})();
+(function(){try{const t=localStorage.getItem('nd4_theme');if(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('themeBtn').textContent=t==='light'?'☀️':'🌙';}}catch(_){}})();
 
-// ── Newsletter section
+/* ── FAQ ── */
+document.querySelectorAll('.fq').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const fi=b.parentElement,open=fi.classList.contains('open');
+    document.querySelectorAll('.fi').forEach(i=>i.classList.remove('open'));
+    if(!open)fi.classList.add('open');
+  });
+});
+
+/* ── Newsletter ── */
 function subNL(){
   const v=document.getElementById('nlEmail').value;
   if(!v||!v.includes('@')){alert('Please enter a valid email.');return;}
   document.getElementById('nlForm').style.display='none';
   document.getElementById('nlOk').style.display='block';
+  try{if(window.fbLog&&window.fbAnalytics)window.fbLog(window.fbAnalytics,'newsletter_signup',{source:'footer_section'});}catch(_){}
 }
 </script>
 </body>
